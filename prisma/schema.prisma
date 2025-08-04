@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model RecipeUrl {
+  id          Int           @id @default(autoincrement())
+  recipeUrl   String        @unique @map("recipe_url")
+  recipeDate  DateTime?     @map("recipe_date")
+  htmlContent String?       @map("html_content") @db.LongText
+  images      RecipeImage[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("recipe_urls")
+}
+
+model RecipeImage {
+  id          Int       @id @default(autoincrement())
+  recipeUrl   RecipeUrl @relation(fields: [recipeUrlId], references: [id])
+  recipeUrlId Int       @map("recipe_url_id")
+  imageUrl    String    @map("image_url")
+  altText     String?   @map("alt_text")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("recipe_images")
+}
