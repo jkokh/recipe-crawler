@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,13 +20,16 @@ model RecipeUrl {
 }
 
 model RecipeImage {
-  id          Int       @id @default(autoincrement())
-  recipeUrl   RecipeUrl @relation(fields: [recipeUrlId], references: [id])
-  recipeUrlId Int       @map("recipe_url_id")
-  imageUrl    String    @map("image_url")
-  altText     String?   @map("alt_text")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id           Int       @id @default(autoincrement())
+  recipeUrl    RecipeUrl @relation(fields: [recipeUrlId], references: [id])
+  recipeUrlId  Int       @map("recipe_url_id")
+  imageUrl     String    @map("image_url") @db.Text
+  imageUrlHash String    @map("image_url_hash") @db.Char(32)
+  altText      String?   @map("alt_text")
+  valid        Boolean   @default(true) @map("valid")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
+  @@unique([recipeUrlId, imageUrlHash])
   @@map("recipe_images")
 }
