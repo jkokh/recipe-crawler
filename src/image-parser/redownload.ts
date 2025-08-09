@@ -6,7 +6,7 @@ import { downloadImageWithPuppeteer } from "../crawler/fetchHtmlPuppeteer"; // A
 
 const prisma = new PrismaClient();
 
-function slugifyUrl(url: string): string {
+export function slugifyUrl(url: string): string {
     try {
         const u = new URL(url);
         const parts = u.pathname.split('/').filter(Boolean);

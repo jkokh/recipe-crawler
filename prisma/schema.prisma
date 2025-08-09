@@ -7,29 +7,193 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// Recipe URL source data
 model RecipeUrl {
   id          Int           @id @default(autoincrement())
   recipeUrl   String        @unique @map("recipe_url")
   recipeDate  DateTime?     @map("recipe_date")
   htmlContent String?       @map("html_content") @db.LongText
+  htmlClean   String?       @map("html_clean") @db.LongText
   images      RecipeImage[]
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
 
   @@map("recipe_urls")
 }
 
 model RecipeImage {
-  id           Int       @id @default(autoincrement())
-  recipeUrl    RecipeUrl @relation(fields: [recipeUrlId], references: [id])
-  recipeUrlId  Int       @map("recipe_url_id")
-  imageUrl     String    @map("image_url") @db.Text
-  imageUrlHash String    @map("image_url_hash") @db.Char(32)
-  altText      String?   @map("alt_text")
-  valid        Boolean   @default(true) @map("valid")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id                  Int                   @id @default(autoincrement())
+  recipeUrlId         Int                   @map("recipe_url_id")
+  imageUrl            String                @map("image_url") @db.Text
+  altText             String?               @map("alt_text") @db.VarChar(1024)
+  valid               Boolean               @default(true) @map("valid")
+  type                String?               @map("type")
+  recipeUrl           RecipeUrl             @relation(fields: [recipeUrlId], references: [id])
+  RecipeStepImageLink RecipeStepImageLink[]
 
-  @@unique([recipeUrlId, imageUrlHash])
+  @@index([recipeUrlId], map: "idx_recipe_images_recipe_url_id")
   @@map("recipe_images")
+}
+
+/// General languages table (existing SQL table: language)
+model Language {
+  code  String @id @db.VarChar(8)
+  title String @db.VarChar(64)
+
+  @@map("language")
+}
+
+/// Ingredients
+model Ingredient {
+  id                Int                     @id @default(autoincrement())
+  canonicalName     String                  @unique @map("canonical_name") @db.VarChar(255)
+  name              String
+  translations      IngredientTranslation[]
+  recipeIngredients RecipeIngredient[] // <-- back relation
+
+  @@map("ingredient")
+}
+
+model IngredientTranslation {
+  id           Int    @id @default(autoincrement())
+  ingredientId Int    @map("ingredient_id")
+  languageCode String @map("language_code") @db.VarChar(8)
+  name         String @db.VarChar(255)
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([ingredientId, languageCode])
+  @@map("ingredient_translation")
+}
+
+/// Tags
+model Tag {
+  id            Int              @id @default(autoincrement())
+  canonicalName String           @unique @map("canonical_name") @db.VarChar(255)
+  name          String           @db.VarChar(255)
+  translations  TagTranslation[]
+  recipes       RecipeTagLink[]
+
+  @@map("tag")
+}
+
+model TagTranslation {
+  id           Int    @id @default(autoincrement())
+  tagId        Int    @map("tag_id")
+  languageCode String @map("language_code") @db.VarChar(8)
+  name         String @db.VarChar(255)
+
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, languageCode])
+  @@map("tag_translation")
+}
+
+/// Recipe–Tag join table
+model RecipeTagLink {
+  recipeId Int
+  tagId    Int
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, tagId])
+  @@map("recipe_tag_link")
+}
+
+/// Recipe ingredients
+model RecipeIngredient {
+  id           Int      @id @default(autoincrement())
+  recipeId     Int      @map("recipe_id")
+  ingredientId Int?     @map("ingredient_id")
+  rawText      String   @db.VarChar(255)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  recipe       Recipe                        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient?                   @relation(fields: [ingredientId], references: [id], onDelete: SetNull)
+  translations RecipeIngredientTranslation[]
+
+  @@map("recipe_ingredient")
+}
+
+model RecipeIngredientTranslation {
+  id                 Int    @id @default(autoincrement())
+  recipeIngredientId Int    @map("recipe_ingredient_id")
+  languageCode       String @db.VarChar(8)
+  translatedText     String @db.VarChar(255)
+
+  recipeIngredient RecipeIngredient @relation(fields: [recipeIngredientId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeIngredientId, languageCode])
+  @@map("recipe_ingredient_translation")
+}
+
+/// Recipe steps
+model RecipeStep {
+  id        Int      @id @default(autoincrement())
+  recipeId  Int      @map("recipe_id")
+  order     Int      @default(0)
+  rawText   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipe       Recipe                  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  translations RecipeStepTranslation[]
+  images       RecipeStepImageLink[]
+
+  @@map("recipe_step")
+}
+
+model RecipeStepTranslation {
+  id             Int    @id @default(autoincrement())
+  recipeStepId   Int    @map("recipe_step_id")
+  languageCode   String @db.VarChar(8)
+  translatedText String @db.Text
+
+  recipeStep RecipeStep @relation(fields: [recipeStepId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeStepId, languageCode])
+  @@map("recipe_step_translation")
+}
+
+model RecipeStepImageLink {
+  id            Int @id @default(autoincrement())
+  recipeStepId  Int @map("recipe_step_id")
+  recipeImageId Int @map("recipe_image_id")
+
+  recipeStep  RecipeStep  @relation(fields: [recipeStepId], references: [id], onDelete: Cascade)
+  recipeImage RecipeImage @relation(fields: [recipeImageId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeStepId, recipeImageId])
+  @@map("recipe_step_image_link")
+}
+
+/// Recipe main table
+model Recipe {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique @db.VarChar(255)
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  translations RecipeTranslation[]
+  ingredients  RecipeIngredient[]
+  steps        RecipeStep[]
+  tags         RecipeTagLink[]
+
+  @@map("recipe")
+}
+
+model RecipeTranslation {
+  id           Int     @id @default(autoincrement())
+  recipeId     Int     @map("recipe_id")
+  languageCode String  @db.VarChar(8)
+  title        String  @db.VarChar(255)
+  description  String? @db.Text
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, languageCode])
+  @@map("recipe_translation")
 }

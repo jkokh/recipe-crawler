@@ -7,7 +7,7 @@
     "linkCrawler": "node --import ./register-loader.js src/crawler/crawler.ts",
     "sitemapLinks": "node --import ./register-loader.js src/sitemap-parser/sitemapParser.ts",
     "prisma:generate": "prisma generate",
-    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy"
   },
   "keywords": [],
@@ -16,14 +16,17 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.13.0",
+    "@types/sanitize-html": "^2.16.0",
     "axios": "^1.11.0",
     "cheerio": "^1.1.2",
     "fast-glob": "^3.3.3",
+    "glob": "^11.0.3",
     "node-ts": "^8.0.6",
     "p-limit": "^6.2.0",
     "puppeteer": "^24.15.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "sanitize-html": "^2.17.0",
     "sharp": "^0.34.3",
     "xml2js": "^0.6.2"
   },
