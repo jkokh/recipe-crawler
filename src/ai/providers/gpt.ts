@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import "dotenv/config";
 import { AIProvider, AIRequestOptions } from "../types";
 
 interface GPTProviderConfig {
@@ -17,7 +18,7 @@ export class GPTProvider implements AIProvider {
 
   constructor(config: GPTProviderConfig = {}) {
     this.client = new OpenAI({
-      apiKey: '',
+      apiKey: process.env.OPENAI_API_KEY,
       baseURL: config.baseURL,
     });
     this.model = config.model || "gpt-5-nano";

@@ -129,19 +129,20 @@ model RecipeStepImageLink {
 }
 
 model Recipe {
-  id           Int                 @id @default(autoincrement())
-  slug         String              @unique @db.VarChar(255)
-  title        String              @db.VarChar(255)
-  description  String?             @db.LongText
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  seo          String?             @db.VarChar(255)
-  nutritions   Nutrition[]
-  ingredients  RecipeIngredient[]
-  steps        RecipeStep[]
-  tags         RecipeTagLink[]
-  translations RecipeTranslation[]
-  RecipeUrl    RecipeUrl[]
+  id             Int                 @id @default(autoincrement())
+  slug           String              @unique @db.VarChar(255)
+  title          String              @db.VarChar(255)
+  description    String?             @db.LongText
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  seo            String?             @db.VarChar(255)
+  nutritions     Nutrition[]
+  ingredients    RecipeIngredient[]
+  steps          RecipeStep[]
+  tags           RecipeTagLink[]
+  translations   RecipeTranslation[]
+  RecipeUrl      RecipeUrl[]
+  RecipeCategory RecipeCategory[]
 
   @@map("recipe")
 }
@@ -212,4 +213,41 @@ model RecipeTagLink {
   @@id([recipeId, tagId])
   @@index([tagId], map: "recipe_tag_link_tagId_fkey")
   @@map("recipe_tag_link")
+}
+
+model Category {
+  id       Int        @id @default(autoincrement())
+  parentId Int?
+  parent   Category?  @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryChildren")
+
+  title String
+  slug  String
+
+  // Relations
+  recipes RecipeCategory[]
+
+  // Meta
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([parentId, slug])
+  @@index([parentId])
+  @@index([slug])
+}
+
+model RecipeCategory {
+  recipeId   Int
+  categoryId Int
+
+  recipe      Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  slug        String
+  description String?  @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@id([recipeId, categoryId])
+  @@index([categoryId, recipeId])
 }

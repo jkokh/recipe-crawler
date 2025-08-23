@@ -27,7 +27,7 @@ export async function processTags() {
     FROM recipe r 
     LEFT JOIN recipe_tag_link rtl ON r.id = rtl.recipeId 
     GROUP BY r.id 
-    HAVING COUNT(rtl.tagId) < 3
+    HAVING COUNT(rtl.tagId) = 4
 `;
 
     const recipeIds = recipeIdsWithFewTags.map(r => r.id);
