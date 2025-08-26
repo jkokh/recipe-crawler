@@ -1,1 +1,0 @@
--- baseline: schema already exists, no-op\n

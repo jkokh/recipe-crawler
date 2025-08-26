@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import {buildTagSlug, toDisplayName} from "../../../utils";
+import {buildSlug, toDisplayName} from "../../../utils";
 
 
 export class TagService {
@@ -13,7 +13,7 @@ export class TagService {
         const seen = new Set<string>();
 
         for (const raw of names) {
-            const slug = buildTagSlug(raw);
+            const slug = buildSlug(raw);
             if (!slug || seen.has(slug)) continue;
             seen.add(slug);
 

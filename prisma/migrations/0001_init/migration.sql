@@ -1,32 +1,4 @@
 -- CreateTable
-CREATE TABLE `recipe_urls` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `recipe_url` VARCHAR(191) NOT NULL,
-    `recipe_date` DATETIME(3) NULL,
-    `html_content` LONGTEXT NULL,
-    `html_clean` LONGTEXT NULL,
-    `json` LONGTEXT NULL,
-    `titleAdded` BOOLEAN NOT NULL DEFAULT false,
-    `recipe_id` INTEGER NULL,
-
-    UNIQUE INDEX `recipe_urls_recipe_url_key`(`recipe_url`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `recipe_images` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `recipe_url_id` INTEGER NOT NULL,
-    `image_url` TEXT NOT NULL,
-    `alt_text` VARCHAR(1024) NULL,
-    `valid` BOOLEAN NOT NULL DEFAULT true,
-    `type` VARCHAR(191) NULL,
-
-    INDEX `idx_recipe_images_recipe_url_id`(`recipe_url_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `language` (
     `code` VARCHAR(8) NOT NULL,
     `title` VARCHAR(64) NOT NULL,
@@ -35,12 +7,58 @@ CREATE TABLE `language` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `categories` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `parentId` INTEGER NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `slug` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `description` TEXT NULL,
+
+    INDEX `categories_parentId_idx`(`parentId`),
+    INDEX `categories_slug_idx`(`slug`),
+    UNIQUE INDEX `categories_parentId_slug_key`(`parentId`, `slug`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `tag` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `slug` VARCHAR(255) NOT NULL,
+
+    UNIQUE INDEX `tag_slug_key`(`slug`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `tag_translation` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tag_id` INTEGER NOT NULL,
+    `language_code` VARCHAR(8) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+
+    UNIQUE INDEX `tag_translation_tag_id_language_code_key`(`tag_id`, `language_code`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `recipe_tag_link` (
+    `recipeId` INTEGER NOT NULL,
+    `tagId` INTEGER NOT NULL,
+
+    INDEX `recipe_tag_link_tagId_fkey`(`tagId`),
+    PRIMARY KEY (`recipeId`, `tagId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `ingredient` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `canonical_name` VARCHAR(255) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
+    `slug` VARCHAR(255) NOT NULL,
 
-    UNIQUE INDEX `ingredient_canonical_name_key`(`canonical_name`),
+    UNIQUE INDEX `ingredient_slug_key`(`slug`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -52,6 +70,32 @@ CREATE TABLE `ingredient_translation` (
     `name` VARCHAR(255) NOT NULL,
 
     UNIQUE INDEX `ingredient_translation_ingredient_id_language_code_key`(`ingredient_id`, `language_code`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `recipe` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `slug` VARCHAR(255) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` LONGTEXT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `seo` VARCHAR(255) NULL,
+
+    UNIQUE INDEX `recipe_slug_key`(`slug`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `recipe_translation` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `recipe_id` INTEGER NOT NULL,
+    `languageCode` VARCHAR(8) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` TEXT NULL,
+
+    UNIQUE INDEX `recipe_translation_recipe_id_languageCode_key`(`recipe_id`, `languageCode`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -114,31 +158,6 @@ CREATE TABLE `recipe_step_image_link` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `recipe` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `slug` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `description` LONGTEXT NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
-    `seo` VARCHAR(255) NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `recipe_translation` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `recipe_id` INTEGER NOT NULL,
-    `languageCode` VARCHAR(8) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `description` TEXT NULL,
-
-    UNIQUE INDEX `recipe_translation_recipe_id_languageCode_key`(`recipe_id`, `languageCode`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `nutrition` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `text` VARCHAR(255) NOT NULL,
@@ -161,56 +180,84 @@ CREATE TABLE `nutrition_translation` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `tag` (
+CREATE TABLE `recipe_urls` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `slug` VARCHAR(255) NOT NULL,
+    `recipe_url` VARCHAR(191) NOT NULL,
+    `recipe_date` DATETIME(3) NULL,
+    `html_content` LONGTEXT NULL,
+    `html_clean` LONGTEXT NULL,
+    `json` LONGTEXT NULL,
+    `recipe_id` INTEGER NULL,
+    `fail` BOOLEAN NOT NULL DEFAULT false,
 
-    UNIQUE INDEX `tag_slug_key`(`slug`),
+    UNIQUE INDEX `recipe_urls_recipe_url_key`(`recipe_url`),
+    UNIQUE INDEX `recipe_urls_recipe_id_key`(`recipe_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `tag_translation` (
+CREATE TABLE `recipe_images` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `tag_id` INTEGER NOT NULL,
-    `language_code` VARCHAR(8) NOT NULL,
-    `name` VARCHAR(255) NOT NULL,
+    `recipe_url_id` INTEGER NOT NULL,
+    `image_url` TEXT NOT NULL,
+    `alt_text` VARCHAR(1024) NULL,
+    `valid` BOOLEAN NOT NULL DEFAULT true,
+    `type` VARCHAR(191) NULL,
 
-    UNIQUE INDEX `tag_translation_tag_id_language_code_key`(`tag_id`, `language_code`),
+    INDEX `idx_recipe_images_recipe_url_id`(`recipe_url_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `tag_alias` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `tag_id` INTEGER NOT NULL,
-    `alias` VARCHAR(255) NOT NULL,
-    `alias_slug` VARCHAR(255) NOT NULL,
-    `source` VARCHAR(32) NOT NULL,
-    `confidence` DOUBLE NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-
-    UNIQUE INDEX `tag_alias_alias_slug_key`(`alias_slug`),
-    INDEX `idx_tag_alias_tag_id`(`tag_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `recipe_tag_link` (
+CREATE TABLE `recipe_categories` (
     `recipeId` INTEGER NOT NULL,
-    `tagId` INTEGER NOT NULL,
+    `categoryId` INTEGER NOT NULL,
+    `score` DOUBLE NOT NULL DEFAULT 0,
 
-    INDEX `recipe_tag_link_tagId_fkey`(`tagId`),
-    PRIMARY KEY (`recipeId`, `tagId`)
+    INDEX `recipe_categories_categoryId_recipeId_idx`(`categoryId`, `recipeId`),
+    INDEX `recipe_categories_recipeId_score_idx`(`recipeId`, `score`),
+    PRIMARY KEY (`recipeId`, `categoryId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `category_centroid` (
+    `categoryId` INTEGER NOT NULL,
+    `vector` LONGBLOB NOT NULL,
+    `dim` INTEGER NOT NULL,
+    `model` VARCHAR(191) NOT NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`categoryId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `recipe_embeddings` (
+    `recipeId` INTEGER NOT NULL,
+    `vector` LONGBLOB NOT NULL,
+    `dim` INTEGER NOT NULL,
+    `model` VARCHAR(191) NOT NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`recipeId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `recipe_images` ADD CONSTRAINT `recipe_images_recipe_url_id_fkey` FOREIGN KEY (`recipe_url_id`) REFERENCES `recipe_urls`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `categories` ADD CONSTRAINT `categories_parentId_fkey` FOREIGN KEY (`parentId`) REFERENCES `categories`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `tag_translation` ADD CONSTRAINT `tag_translation_tag_id_fkey` FOREIGN KEY (`tag_id`) REFERENCES `tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `recipe_tag_link` ADD CONSTRAINT `recipe_tag_link_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `recipe_tag_link` ADD CONSTRAINT `recipe_tag_link_tagId_fkey` FOREIGN KEY (`tagId`) REFERENCES `tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ingredient_translation` ADD CONSTRAINT `ingredient_translation_ingredient_id_fkey` FOREIGN KEY (`ingredient_id`) REFERENCES `ingredient`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `recipe_translation` ADD CONSTRAINT `recipe_translation_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `recipe_ingredient` ADD CONSTRAINT `recipe_ingredient_ingredient_id_fkey` FOREIGN KEY (`ingredient_id`) REFERENCES `ingredient`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -234,23 +281,26 @@ ALTER TABLE `recipe_step_image_link` ADD CONSTRAINT `recipe_step_image_link_reci
 ALTER TABLE `recipe_step_image_link` ADD CONSTRAINT `recipe_step_image_link_recipe_step_id_fkey` FOREIGN KEY (`recipe_step_id`) REFERENCES `recipe_step`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `recipe_translation` ADD CONSTRAINT `recipe_translation_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `nutrition` ADD CONSTRAINT `nutrition_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `nutrition_translation` ADD CONSTRAINT `nutrition_translation_nutrition_id_fkey` FOREIGN KEY (`nutrition_id`) REFERENCES `nutrition`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `tag_translation` ADD CONSTRAINT `tag_translation_tag_id_fkey` FOREIGN KEY (`tag_id`) REFERENCES `tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `recipe_urls` ADD CONSTRAINT `recipe_urls_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `tag_alias` ADD CONSTRAINT `tag_alias_tag_id_fkey` FOREIGN KEY (`tag_id`) REFERENCES `tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `recipe_images` ADD CONSTRAINT `recipe_images_recipe_url_id_fkey` FOREIGN KEY (`recipe_url_id`) REFERENCES `recipe_urls`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `recipe_tag_link` ADD CONSTRAINT `recipe_tag_link_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `recipe_categories` ADD CONSTRAINT `recipe_categories_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `recipe_tag_link` ADD CONSTRAINT `recipe_tag_link_tagId_fkey` FOREIGN KEY (`tagId`) REFERENCES `tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `recipe_categories` ADD CONSTRAINT `recipe_categories_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `category_centroid` ADD CONSTRAINT `category_centroid_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `recipe_embeddings` ADD CONSTRAINT `recipe_embeddings_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 

@@ -34,7 +34,7 @@ export function toDisplayName(input: string): string {
         .join(' ');
 }
 
-export function buildTagSlug(raw: string): string | null {
+export function buildSlug(raw: string): string | null {
     function keepAlnum(s: string): string {
         return s.replace(/[^a-z0-9]/g, '');
     }
