@@ -4,25 +4,35 @@ import {Ingredient, parseIngredients} from "./parser";
 import {ensureIngredientId, normalizeIngredientName} from "./ensureIngredient";
 import {extractIngredientTextsFromArticle} from "./extract";
 import {findIngredientId, LoadedIng, preloadIngredients} from "./ingredientMatch";
+import {aiPipeline} from "./ai-pipeline";
+
+type Source =  'DOM' | 'TEXT' | 'GPT' | 'OLLAMA';
+
+type Row = {
+    recipeId: number;
+    ingredientId: number | null;
+    text: string;
+    source: Source;
+};
 
 export type Recipe = Prisma.RecipeGetPayload<{
     select: {
         id: true
         title: true
         description: true
+        ingredients: true
         recipeUrl: {
             select: {
-                htmlContent: true,
+                htmlClean: true
+                htmlContent: true
                 json: true
             }
         }
     }
 }>
-const result: number[] = [];
 
 let totalParsed = 0;
 let totalMissing = 0;
-let noIngredients = 0;
 
 // helper: build normalized text for RecipeIngredient.text
 function buildIngredientText(i: Ingredient): string {
@@ -32,18 +42,20 @@ function buildIngredientText(i: Ingredient): string {
 }
 
 export async function process() {
-    await prisma.recipeIngredient.deleteMany();
+    //await prisma.recipeIngredient.deleteMany();
 
-    const ingIndex: LoadedIng[] = await preloadIngredients();
+    const preloadedIngredients: LoadedIng[] = await preloadIngredients();
 
     await iterate(prisma.recipe)
         .select({
             id: true,
             title: true,
             description: true,
+            ingredients: true,
             recipeUrl: {
                 select: {
                     htmlContent: true,
+                    htmlClean: true,
                     json: true
                 }
             }
@@ -53,51 +65,75 @@ export async function process() {
         .perPage(50)
         .entityName('recipes')
         .forEachAsync(async (recipe: Recipe) => {
-            const ingredients = parseIngredients(recipe.recipeUrl!.htmlContent!);
-            const rows: { recipeId: number; ingredientId: number | null; text: string }[] = [];
-            if (!ingredients || ingredients.length === 0) {
+            if (recipe.ingredients.length) {
+                return;
+            }
+            const rows: Row[] = [];
 
-                try {
-                    const textLines = extractIngredientTextsFromArticle(
-                        JSON.parse(recipe.recipeUrl!.json!)
-                    );
+            const html = recipe.recipeUrl?.htmlContent ?? "";
+            const jsonObj = (() => { try { return JSON.parse(recipe.recipeUrl?.json ?? "null"); } catch { return null; } })();
 
-                    for (const line of textLines) {
-                        const ingredientId = findIngredientId(line, ingIndex); // may be null
-                        const text = line.replace(/\s+/g, " ").trim().slice(0, 255);
-                        rows.push({ recipeId: recipe.id, ingredientId, text });
-                    }
-                } catch {
-                    console.log('not valid');
+            const norm255 = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 255);
+
+            const pushUnique = (ingredientId: number | null, text: string, source: Source) => {
+                const t = norm255(text);
+                if (!t) return;
+                rows.push({ recipeId: recipe.id, ingredientId, text: t, source });
+            };
+
+            const addFromParsed = async (ings: Ingredient[], source: Source) => {
+                for (const ing of ings ?? []) {
+                    const id = await ensureIngredientId(ing.name);
+                    pushUnique(id, buildIngredientText(ing), source);
                 }
+            };
+
+            const addFromLines = (lines: string[], source: Source) => {
+                for (const line of lines ?? []) {
+                    const id = findIngredientId(line, preloadedIngredients);
+                    pushUnique(id, line, source);
+                }
+            };
+
+            // --- Stage 1: HTML ---
+            if (html) {
+                await addFromParsed(parseIngredients(html), 'DOM');
+            }
+
+            // --- Stage 2: JSON block fallback ---
+            if (!rows.length && jsonObj) {
+                const lines = extractIngredientTextsFromArticle(jsonObj);
+                addFromLines(lines, 'TEXT');
+            }
+
+            // --- Stage 3: AI fallback ---
+            if (!rows.length && jsonObj) {
+                const lines = await aiPipeline(recipe.recipeUrl!.htmlClean);
+                addFromLines(lines, 'GPT');
+            }
+
+            // --- Insert & counters ---
+            if (rows.length) {
+                await prisma.recipeIngredient.deleteMany({
+                    where: { recipeId: recipe.id }
+                });
+                await prisma.recipeIngredient.createMany({ data: rows });
+                totalParsed++;
+            } else {
                 totalMissing++;
             }
-
-            for (const ing of ingredients) {
-                const ingredientId = await ensureIngredientId(ing.name); // ensure + validate inside
-
-                const text = buildIngredientText(ing);
-                rows.push({ recipeId: recipe.id, ingredientId, text });
-            }
-
-            if (rows.length) {
-                await prisma.recipeIngredient.createMany({ data: rows });
-            } else {
-                noIngredients++;
-            }
-
-            totalParsed++;
         });
+
+
     console.log(
         '\x1b[32m%s\x1b[0m',
-        `Parsed ${totalParsed} recipes, ${totalMissing} missing, no ingredients: ${noIngredients}`
+        `Parsed ${totalParsed} recipes, ${totalMissing} missing`
     );
 }
 
 async function main() {
     try {
         await process();
-        console.log("Marked: ", result);
     } catch (error) {
         console.error('Error processing recipes:', error);
     }

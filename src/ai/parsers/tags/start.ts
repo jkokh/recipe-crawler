@@ -76,7 +76,6 @@ export async function processTags() {
 async function main() {
   try {
     await processTags();
-    console.log("Marked: ", result);
   } catch (error) {
     console.error('Error processing recipes:', error);
   }

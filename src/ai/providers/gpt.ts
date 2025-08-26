@@ -2,6 +2,9 @@ import OpenAI from "openai";
 import "dotenv/config";
 import { AIProvider, AIRequestOptions } from "../types";
 
+
+const MODEL = "gpt-5";
+
 interface GPTProviderConfig {
   apiKey?: string;            // defaults to process.env.OPENAI_API_KEY
   baseURL?: string;           // optional (proxy/self-hosted)
@@ -21,7 +24,7 @@ export class GPTProvider implements AIProvider {
       apiKey: process.env.OPENAI_API_KEY,
       baseURL: config.baseURL,
     });
-    this.model = config.model || "gpt-5-nano";
+    this.model = MODEL;
     this.returnJsonStructure = config.returnJsonStructure;
     this.maxInputLength = config.maxInputLength || 3000;
   }

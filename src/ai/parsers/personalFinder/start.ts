@@ -42,7 +42,6 @@ export async function processRecipesWithEmptyTitles() {
 async function main() {
   try {
     await processRecipesWithEmptyTitles();
-    console.log("Marked: ", result);
   } catch (error) {
     console.error('Error processing recipes:', error);
   }

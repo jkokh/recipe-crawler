@@ -66,7 +66,7 @@ model RecipeTagLink {
 }
 
 model Ingredient {
-  id                Int                     @id @default(autoincrement())
+  id                BigInt                  @id @default(autoincrement())
   name              String
   slug              String                  @unique @db.VarChar(255)
   translations      IngredientTranslation[]
@@ -77,8 +77,8 @@ model Ingredient {
 }
 
 model IngredientTranslation {
-  id           Int        @id @default(autoincrement())
-  ingredientId Int        @map("ingredient_id")
+  id           BigInt     @id @default(autoincrement())
+  ingredientId BigInt     @map("ingredient_id")
   languageCode String     @map("language_code") @db.VarChar(8)
   name         String     @db.VarChar(255)
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
@@ -119,13 +119,22 @@ model RecipeTranslation {
   @@map("recipe_translation")
 }
 
+enum ingredient_source {
+  DOM
+  TEXT
+  GPT
+  OLLAMA
+}
+
 model RecipeIngredient {
-  id           Int                           @id @default(autoincrement())
-  recipeId     Int                           @map("recipe_id")
-  ingredientId Int?                          @map("ingredient_id")
-  createdAt    DateTime                      @default(now())
-  updatedAt    DateTime                      @updatedAt
-  text         String                        @db.VarChar(255)
+  id           BigInt            @id @default(autoincrement())
+  recipeId     Int               @map("recipe_id")
+  ingredientId BigInt?           @map("ingredient_id")
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  text         String            @db.VarChar(255)
+  source       ingredient_source @default(DOM) // 👈 NEW
+
   ingredient   Ingredient?                   @relation(fields: [ingredientId], references: [id])
   recipe       Recipe                        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   translations RecipeIngredientTranslation[]
@@ -136,8 +145,8 @@ model RecipeIngredient {
 }
 
 model RecipeIngredientTranslation {
-  id                 Int              @id @default(autoincrement())
-  recipeIngredientId Int              @map("recipe_ingredient_id")
+  id                 BigInt           @id @default(autoincrement())
+  recipeIngredientId BigInt           @map("recipe_ingredient_id")
   languageCode       String           @db.VarChar(8)
   translatedText     String           @db.VarChar(255)
   recipeIngredient   RecipeIngredient @relation(fields: [recipeIngredientId], references: [id], onDelete: Cascade)
