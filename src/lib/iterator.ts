@@ -123,7 +123,7 @@ export class PaginatedIterator<T> {
         const currentItemNumber = totalProcessed + i + 1; // Global item number
 
         try {
-          console.log(`Processing item ${currentItemNumber}/${totalCount}...`);
+          //console.log(`Processing item ${currentItemNumber}/${totalCount}...`);
           await processFunction(item);
         } catch (error: any) {
           const itemId = item && typeof item === 'object' && 'id' in item ? (item as any).id : 'unknown';

@@ -54,9 +54,10 @@ CREATE TABLE `recipe_tag_link` (
 
 -- CreateTable
 CREATE TABLE `ingredient` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(255) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `ingredient_slug_key`(`slug`),
     PRIMARY KEY (`id`)
@@ -64,8 +65,8 @@ CREATE TABLE `ingredient` (
 
 -- CreateTable
 CREATE TABLE `ingredient_translation` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ingredient_id` INTEGER NOT NULL,
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `ingredient_id` BIGINT NOT NULL,
     `language_code` VARCHAR(8) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
 
@@ -101,12 +102,13 @@ CREATE TABLE `recipe_translation` (
 
 -- CreateTable
 CREATE TABLE `recipe_ingredient` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
     `recipe_id` INTEGER NOT NULL,
-    `ingredient_id` INTEGER NULL,
+    `ingredient_id` BIGINT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `text` VARCHAR(255) NOT NULL,
+    `source` ENUM('DOM', 'TEXT', 'GPT', 'OLLAMA') NOT NULL DEFAULT 'DOM',
 
     INDEX `recipe_ingredient_ingredient_id_fkey`(`ingredient_id`),
     INDEX `recipe_ingredient_recipe_id_fkey`(`recipe_id`),
@@ -115,8 +117,8 @@ CREATE TABLE `recipe_ingredient` (
 
 -- CreateTable
 CREATE TABLE `recipe_ingredient_translation` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `recipe_ingredient_id` INTEGER NOT NULL,
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `recipe_ingredient_id` BIGINT NOT NULL,
     `languageCode` VARCHAR(8) NOT NULL,
     `translatedText` VARCHAR(255) NOT NULL,
 
@@ -160,8 +162,9 @@ CREATE TABLE `recipe_step_image_link` (
 -- CreateTable
 CREATE TABLE `nutrition` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `text` VARCHAR(255) NOT NULL,
     `recipe_id` INTEGER NOT NULL,
+    `label` VARCHAR(255) NOT NULL,
+    `value` VARCHAR(255) NOT NULL,
 
     INDEX `nutrition_recipe_id_idx`(`recipe_id`),
     PRIMARY KEY (`id`)
@@ -196,7 +199,7 @@ CREATE TABLE `recipe_urls` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `recipe_images` (
+CREATE TABLE `recipe_url_images` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `recipe_url_id` INTEGER NOT NULL,
     `image_url` TEXT NOT NULL,
@@ -241,6 +244,29 @@ CREATE TABLE `recipe_embeddings` (
     PRIMARY KEY (`recipeId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `recipe_meta` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `recipe_id` INTEGER NOT NULL,
+    `key` VARCHAR(128) NOT NULL,
+    `value` JSON NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    INDEX `idx_recipe_meta_recipe_id`(`recipe_id`),
+    UNIQUE INDEX `recipe_meta_recipe_id_key_key`(`recipe_id`, `key`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `_RecipeToRecipeUrlImage` (
+    `A` INTEGER NOT NULL,
+    `B` INTEGER NOT NULL,
+
+    UNIQUE INDEX `_RecipeToRecipeUrlImage_AB_unique`(`A`, `B`),
+    INDEX `_RecipeToRecipeUrlImage_B_index`(`B`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `categories` ADD CONSTRAINT `categories_parentId_fkey` FOREIGN KEY (`parentId`) REFERENCES `categories`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -275,7 +301,7 @@ ALTER TABLE `recipe_step` ADD CONSTRAINT `recipe_step_recipe_id_fkey` FOREIGN KE
 ALTER TABLE `recipe_step_translation` ADD CONSTRAINT `recipe_step_translation_recipe_step_id_fkey` FOREIGN KEY (`recipe_step_id`) REFERENCES `recipe_step`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `recipe_step_image_link` ADD CONSTRAINT `recipe_step_image_link_recipe_image_id_fkey` FOREIGN KEY (`recipe_image_id`) REFERENCES `recipe_images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `recipe_step_image_link` ADD CONSTRAINT `recipe_step_image_link_recipe_image_id_fkey` FOREIGN KEY (`recipe_image_id`) REFERENCES `recipe_url_images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `recipe_step_image_link` ADD CONSTRAINT `recipe_step_image_link_recipe_step_id_fkey` FOREIGN KEY (`recipe_step_id`) REFERENCES `recipe_step`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -290,7 +316,7 @@ ALTER TABLE `nutrition_translation` ADD CONSTRAINT `nutrition_translation_nutrit
 ALTER TABLE `recipe_urls` ADD CONSTRAINT `recipe_urls_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `recipe_images` ADD CONSTRAINT `recipe_images_recipe_url_id_fkey` FOREIGN KEY (`recipe_url_id`) REFERENCES `recipe_urls`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `recipe_url_images` ADD CONSTRAINT `recipe_images_recipe_url_id_fkey` FOREIGN KEY (`recipe_url_id`) REFERENCES `recipe_urls`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `recipe_categories` ADD CONSTRAINT `recipe_categories_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -303,4 +329,13 @@ ALTER TABLE `category_centroid` ADD CONSTRAINT `category_centroid_categoryId_fke
 
 -- AddForeignKey
 ALTER TABLE `recipe_embeddings` ADD CONSTRAINT `recipe_embeddings_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `recipe_meta` ADD CONSTRAINT `recipe_meta_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `_RecipeToRecipeUrlImage` ADD CONSTRAINT `_RecipeToRecipeUrlImage_A_fkey` FOREIGN KEY (`A`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `_RecipeToRecipeUrlImage` ADD CONSTRAINT `_RecipeToRecipeUrlImage_B_fkey` FOREIGN KEY (`B`) REFERENCES `recipe_url_images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
