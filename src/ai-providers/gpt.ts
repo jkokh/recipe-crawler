@@ -1,9 +1,8 @@
 import OpenAI from "openai";
 import "dotenv/config";
-import { AIProvider, AIRequestOptions } from "../types";
+import {AIProvider, AIRequestOptions} from "../ai/types";
 
-
-const MODEL = "gpt-5";
+const MODEL = "gpt-4.1-mini";
 
 interface GPTProviderConfig {
   apiKey?: string;            // defaults to process.env.OPENAI_API_KEY

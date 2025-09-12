@@ -1,5 +1,6 @@
 import { Ollama } from 'ollama';
-import { AIProvider, AIRequestOptions } from '../types';
+import {AIProvider, AIRequestOptions} from "../ai/types";
+
 
 interface OllamaProviderConfig {
   host?: string;

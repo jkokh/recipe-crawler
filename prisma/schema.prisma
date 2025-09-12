@@ -167,12 +167,14 @@ model RecipeIngredientTranslation {
 }
 
 model RecipeStep {
-  id       Int    @id @default(autoincrement())
-  recipeId Int    @map("recipe_id")
-  order    Int    @default(0)
-  title    String @db.VarChar(255)
-  text     String @db.Text
-  source   source @default(DOM)
+  id       Int     @id @default(autoincrement())
+  recipeId Int     @map("recipe_id")
+  order    Int     @default(0)
+  title    String  @db.VarChar(255)
+  text     String  @db.Text
+  textAlt  String? @db.Text
+  titleAlt String? @db.VarChar(255)
+  source   source  @default(DOM)
 
   recipe                Recipe                  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   images                RecipeImage[] // one step → many images
@@ -218,16 +220,24 @@ model NutritionTranslation {
 }
 
 model RecipeUrl {
-  id          Int              @id @default(autoincrement())
-  recipeUrl   String           @unique @map("recipe_url")
-  recipeDate  DateTime?        @map("recipe_date")
-  htmlContent String?          @map("html_content") @db.LongText
-  htmlClean   String?          @map("html_clean") @db.LongText
-  json        String?          @map("json") @db.LongText
-  recipeId    Int?             @unique @map("recipe_id")
-  fail        Boolean          @default(false)
-  images      RecipeUrlImage[]
-  recipe      Recipe?          @relation(fields: [recipeId], references: [id])
+  id          Int       @id @default(autoincrement())
+  recipeUrl   String    @unique @map("recipe_url")
+  recipeDate  DateTime? @map("recipe_date")
+  htmlContent String?   @map("html_content") @db.LongText
+  htmlClean   String?   @map("html_clean") @db.LongText
+
+  json               String? @map("json") @db.LongText
+  jsonHistory        Json?   @map("json_history") @db.Json
+  jsonAltered        Json?   @map("json_altered") @db.Json
+  jsonAlteredHistory Json?   @map("json_altered_history") @db.Json
+
+  recipeId       Int?             @unique @map("recipe_id")
+  images         RecipeUrlImage[]
+  recipe         Recipe?          @relation(fields: [recipeId], references: [id])
+  articleBatchId String?          @map("article_batch_id") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("recipe_urls")
 }

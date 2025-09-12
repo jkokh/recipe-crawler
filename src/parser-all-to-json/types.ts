@@ -56,13 +56,3 @@ export interface RecipeMeta {
     yield?: string;
 }
 
-export type RecipeParsed = {
-    title: string;
-    ingredients: Ingredient[] | null;
-    nutrition: Nutrition | null;
-    paragraphs: Paragraph[] | null;
-    steps: Step[] | null;
-    meta: RecipeMeta | null;
-    needsReview: boolean;
-}
-

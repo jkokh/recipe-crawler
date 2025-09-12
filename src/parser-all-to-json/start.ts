@@ -1,4 +1,4 @@
-import {Recipe, RecipeParsed} from "./types";
+import {Recipe, RecipeJson} from "./types";
 import * as cheerio from "cheerio";
 import {iterate, prisma} from "../lib/iterator";
 import {getTitle} from "./modules/getTitle";
@@ -43,7 +43,7 @@ id: 73
 
             const needsReview = ingredients.needsReview || steps.needsReview || paragraphs.needsReview;
 
-            const recipeParsed: RecipeParsed = {
+            const recipeParsed: RecipeJson = {
                 title,
                 ingredients: ingredients.data,
                 nutrition,
