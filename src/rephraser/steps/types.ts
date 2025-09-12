@@ -13,10 +13,12 @@ export type Recipe = Prisma.RecipeGetPayload<{
         steps: true;
         recipeUrl: {
             select: {
+                id: true;
                 htmlClean: true;
                 htmlContent: true;
                 json: true;
                 images: true;
+                jsonAltered: true;
             };
         };
     };

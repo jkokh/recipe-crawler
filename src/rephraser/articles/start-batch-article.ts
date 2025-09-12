@@ -38,6 +38,7 @@ export async function process() {
         .where({
             articleBatchId: null,
         })
+        .orderBy({ id: 'asc' })
         .startPosition(1)
         .perPage(50)
         .entityName("recipes")

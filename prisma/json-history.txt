@@ -5,15 +5,10 @@ CREATE TRIGGER trg_recipe_urls_json_history
 BEFORE UPDATE ON recipe_urls
 FOR EACH ROW
 BEGIN
-  -- Detect actual change
-  -- For JSON columns this compares semantic JSON; for LONGTEXT it compares the text.
+  /* Track changes for `json` -> `json_history` */
   IF NOT (NEW.json <=> OLD.json) THEN
-    -- Only append if there was a previous value
     IF OLD.json IS NOT NULL THEN
-      -- Ensure history array exists
       SET NEW.json_history = COALESCE(NEW.json_history, JSON_ARRAY());
-
-      -- If OLD.json is valid JSON, store it as JSON; otherwise store as {"raw": "..."}
       SET NEW.json_history = JSON_ARRAY_APPEND(
         NEW.json_history, '$',
         JSON_OBJECT(
@@ -21,10 +16,27 @@ BEGIN
           'updatedAt', DATE_FORMAT(NOW(6), '%Y-%m-%dT%H:%i:%s.%fZ')
         )
       );
-
-      -- Keep last 50 snapshots
+      /* keep last 50 */
       WHILE JSON_LENGTH(NEW.json_history) > 50 DO
         SET NEW.json_history = JSON_REMOVE(NEW.json_history, '$[0]');
+      END WHILE;
+    END IF;
+  END IF;
+
+  /* Track changes for `json_altered` -> `json_altered_history` */
+  IF NOT (NEW.json_altered <=> OLD.json_altered) THEN
+    IF OLD.json_altered IS NOT NULL THEN
+      SET NEW.json_altered_history = COALESCE(NEW.json_altered_history, JSON_ARRAY());
+      SET NEW.json_altered_history = JSON_ARRAY_APPEND(
+        NEW.json_altered_history, '$',
+        JSON_OBJECT(
+          'data', IF(JSON_VALID(OLD.json_altered), CAST(OLD.json_altered AS JSON), JSON_OBJECT('raw', OLD.json_altered)),
+          'updatedAt', DATE_FORMAT(NOW(6), '%Y-%m-%dT%H:%i:%s.%fZ')
+        )
+      );
+      /* keep last 50 */
+      WHILE JSON_LENGTH(NEW.json_altered_history) > 50 DO
+        SET NEW.json_altered_history = JSON_REMOVE(NEW.json_altered_history, '$[0]');
       END WHILE;
     END IF;
   END IF;
