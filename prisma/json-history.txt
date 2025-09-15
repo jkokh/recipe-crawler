@@ -1,0 +1,49 @@
+DROP TRIGGER IF EXISTS trg_recipe_urls_json_history;
+DELIMITER $$
+
+CREATE TRIGGER trg_recipe_urls_json_history
+BEFORE UPDATE ON recipe_urls
+FOR EACH ROW
+BEGIN
+  /* Track changes for `json` -> `json_history` */
+  IF NOT (NEW.json <=> OLD.json) THEN
+    IF OLD.json IS NOT NULL THEN
+      -- Use OLD history as the base so we don't wipe it out
+      SET NEW.json_history = IFNULL(OLD.json_history, JSON_ARRAY());
+
+      SET NEW.json_history = JSON_ARRAY_APPEND(
+        NEW.json_history, '$',
+        JSON_OBJECT(
+          'data', IF(JSON_VALID(OLD.json), CAST(OLD.json AS JSON), JSON_OBJECT('raw', OLD.json)),
+          'updatedAt', DATE_FORMAT(NOW(6), '%Y-%m-%dT%H:%i:%s.%fZ')
+        )
+      );
+
+      /* keep last 50 */
+      WHILE JSON_LENGTH(NEW.json_history) > 50 DO
+        SET NEW.json_history = JSON_REMOVE(NEW.json_history, '$[0]');
+      END WHILE;
+    END IF;
+  END IF;
+
+  /* Track changes for `json_altered` -> `json_altered_history` */
+  IF NOT (NEW.json_altered <=> OLD.json_altered) THEN
+    -- Snapshot even when setting to NULL (captures the previous value)
+    SET NEW.json_altered_history = IFNULL(OLD.json_altered_history, JSON_ARRAY());
+
+    SET NEW.json_altered_history = JSON_ARRAY_APPEND(
+      NEW.json_altered_history, '$',
+      JSON_OBJECT(
+        'data', IF(JSON_VALID(OLD.json_altered), CAST(OLD.json_altered AS JSON), JSON_OBJECT('raw', OLD.json_altered)),
+        'updatedAt', DATE_FORMAT(NOW(6), '%Y-%m-%dT%H:%i:%s.%fZ')
+      )
+    );
+
+    /* keep last 50 */
+    WHILE JSON_LENGTH(NEW.json_altered_history) > 50 DO
+      SET NEW.json_altered_history = JSON_REMOVE(NEW.json_altered_history, '$[0]');
+    END WHILE;
+  END IF;
+END$$
+
+DELIMITER ;

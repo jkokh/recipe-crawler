@@ -4,3 +4,5 @@ node_modules
 
 /src/generated/prisma
 /src/sitemap-parser/sitemaps/
+/src/image-parser/images/
+/src/ai/categories/.models/

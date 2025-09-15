@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import readline from 'readline';
+import fs from "fs/promises";
 
 puppeteer.use(StealthPlugin());
 
@@ -17,7 +18,7 @@ function waitForUserInput(message: string) {
 }
 
 // Returns: { html, status }
-export async function fetchHtmlWithPuppeteer(url: string, browser): Promise<{ html: string, status: number }> {
+export async function fetchHtmlWithPuppeteer(url: string, browser: any): Promise<{ html: string, status: number }> {
     const page = await browser.newPage();
     const resp = await page.goto(url, { waitUntil: "networkidle2" });
     const status = resp?.status() ?? 0;
@@ -28,4 +29,19 @@ export async function fetchHtmlWithPuppeteer(url: string, browser): Promise<{ ht
     const html = await page.content();
     await page.close();
     return { html, status };
+}
+
+export async function downloadImageWithPuppeteer(imageUrl: string, filePath: string, referer: string) {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+
+    // Set Referer
+    await page.setExtraHTTPHeaders({ "referer": referer });
+
+    const viewSource = await page.goto(imageUrl, { waitUntil: 'networkidle2' });
+    const buffer = await (viewSource!).buffer();
+
+    await fs.writeFile(filePath, buffer);
+
+    await browser.close();
 }
