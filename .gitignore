@@ -3,6 +3,6 @@ node_modules
 .env
 
 /src/generated/prisma
-/src/sitemap-parser/sitemaps/
+/src/0.sitemap-parser/sitemaps/
 /src/image-parser/images/
 /src/ai/categories/.models/

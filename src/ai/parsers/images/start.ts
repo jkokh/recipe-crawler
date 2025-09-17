@@ -1,5 +1,5 @@
-import { iterate, prisma } from '../../iterator';
 import {Recipe} from "./types";
+import {iterate, prisma} from "../../../lib/iterator";
 //import {NutritionJSON, NutritionRow, Recipe} from "./types";
 
 let totalParsed = 0;

@@ -95,6 +95,7 @@ model Recipe {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   seo          String?             @db.VarChar(255)
+  categories   RecipeCategory[]
   nutritions   Nutrition[]
   images       RecipeImage[]
   ingredients  RecipeIngredient[]
@@ -215,21 +216,20 @@ model NutritionTranslation {
 }
 
 model RecipeUrl {
-  id                 Int              @id @default(autoincrement())
-  recipeUrl          String           @unique @map("recipe_url")
-  recipeDate         DateTime?        @map("recipe_date")
-  htmlContent        String?          @map("html_content") @db.LongText
-  htmlClean          String?          @map("html_clean") @db.LongText
-  json               String?          @map("json") @db.LongText
-  recipeId           Int?             @unique @map("recipe_id")
-  createdAt          DateTime         @default(now()) @map("created_at")
-  updatedAt          DateTime         @default(now()) @updatedAt @map("updated_at")
-  jsonAltered        Json?            @map("json_altered")
-  jsonAlteredHistory Json?            @map("json_altered_history")
-  jsonHistory        Json?            @map("json_history")
-  batchId            Json?            @map("batch_id")
-  images             RecipeUrlImage[]
-  recipe             Recipe?          @relation(fields: [recipeId], references: [id])
+  id          Int              @id @default(autoincrement())
+  recipeUrl   String           @unique @map("recipe_url")
+  recipeDate  DateTime?        @map("recipe_date")
+  htmlContent String?          @map("html_content") @db.LongText
+  recipeId    Int?             @unique @map("recipe_id")
+  json        Json?            @map("json")
+  jsonHistory Json?            @map("json_history")
+  images      RecipeUrlImage[]
+  batchId     Json?            @map("batch_id")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  recipe Recipe? @relation(fields: [recipeId], references: [id])
 
   @@map("recipe_urls")
 }
@@ -250,7 +250,9 @@ model RecipeUrlImage {
 model RecipeCategory {
   recipeId   Int
   categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@id([recipeId, categoryId])
   @@index([categoryId, recipeId])

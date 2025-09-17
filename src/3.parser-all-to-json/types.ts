@@ -1,23 +1,3 @@
-import {Ingredient, Nutrition, Paragraph, RecipeMeta, Step} from "./3.parser-all-to-json/types";
-
-export type RecipeJson = {
-    title: string;
-    ingredients: Ingredient[] | null;
-    nutrition?: Nutrition | null;
-    paragraphs: Paragraph[] | null;
-    steps: Step[] | null;
-    meta?: RecipeMeta | null;
-    needsReview?: boolean;
-    categories: number[];
-    tags?: string[];
-    images?: number[];
-}
-
-export type Batch = {
-    id: string;
-    name: string;
-}
-
 import { Prisma } from "@prisma/client";
 
 export type Recipe = Prisma.RecipeGetPayload<{
@@ -30,19 +10,15 @@ export type Recipe = Prisma.RecipeGetPayload<{
         createdAt: true;
         updatedAt: true;
         recipeUrl: { select: {
-                id: true,
                 json: true,
-                recipeUrl: true,
-                images: true,
-                htmlContent: true,
+                recipeUrl: true
+                htmlContent: true
             } }
         steps: {
             select: {
                 id: true;
                 order: true;
                 title: true;
-                source: true;
-                recipeId: true;
                 text: true;
                 titleAlt: true;
                 textAlt: true;
@@ -78,3 +54,42 @@ export type Recipe = Prisma.RecipeGetPayload<{
         };
     };
 }>;
+
+
+export interface Ingredient {
+    name: string;
+    quantity?: string;
+    unit?: string;
+}
+
+export type NutritionRow = {
+    label: string;
+    value?: string;
+};
+
+export type Nutrition = {
+    servings: string;
+    rows: NutritionRow[];
+}
+
+export type Paragraph = {
+    header?: string;
+    text?: string;
+    list?: string[];
+    images?: number[];
+}
+
+export type Step = {
+    title: string;
+    instructions: string;
+    images?: number[];
+}
+
+export interface RecipeMeta {
+    title?: string;
+    prepTime?: string;
+    totalTime?: string;
+    servings?: string;
+    yield?: string;
+}
+

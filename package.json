@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "linkCrawler": "node --import ./register-loader.js src/crawler/crawler.ts",
-    "sitemapLinks": "node --import ./register-loader.js src/sitemap-parser/sitemapParser.ts",
+    "sitemapLinks": "node --import ./register-loader.js src/0.sitemap-parser/sitemapParser.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy"
@@ -28,6 +28,7 @@
     "fuse.js": "^7.1.0",
     "glob": "^11.0.3",
     "html-validate": "^10.0.0",
+    "jimp": "^1.6.0",
     "minisearch": "^7.1.2",
     "node-ts": "^8.0.6",
     "ollama": "^0.5.17",

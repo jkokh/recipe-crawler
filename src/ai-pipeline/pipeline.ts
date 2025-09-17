@@ -4,10 +4,6 @@ function isProcessor(fn: any): boolean {
   return fn.__type === 'processor';
 }
 
-function isValidator(fn: any): boolean {
-  return fn.__type === 'validator';
-}
-
 export class Pipeline<T> {
   private steps: PipelineStep<T>[] = [];
 

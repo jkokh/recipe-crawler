@@ -26,6 +26,16 @@ export type MinimalRecipe = {
     description?: string | null;
     steps?: MinimalStep[];
     ingredients?: MinimalIngredient[];
+    recipeUrl?: {
+        jsonAltered?: {
+            paragraphs: {
+                header?: string;
+                text?: string;
+                list?: string[];
+            }[];
+        }
+
+    };
 };
 
 // ---------- config (tunable) ----------
@@ -134,12 +144,18 @@ function relevanceStrictWeighted(
     const titleRaw = basicNormalize(recipe.title ?? "");
     const bodyRaw = basicNormalize(
         [
-            recipe.description ?? "",
             ...(recipe.steps ?? []).map(
                 s => `${s.title ?? ""} ${s.text ?? ""} ${s.titleAlt ?? ""} ${s.textAlt ?? ""}`
-            )
+            ),
+            ...(recipe.recipeUrl!.jsonAltered?.paragraphs ?? []).map(p => {
+                if (p.text) return p.text;
+                if (p.header) return p.header;
+                if (Array.isArray(p.list)) return p.list.join(" ");
+                return "";
+            })
         ].join(" ")
     );
+
     const ingredRaw = basicNormalize((recipe.ingredients ?? []).map(i => i.text).join(" "));
 
     // Singularized variants for recall

@@ -45,7 +45,7 @@ class CategoryProcessor {
             matched = true;
 
             const format = (cat: any, tag = "") =>
-                `${cat.path.map((p: any) => p.title).join(" > ")}: id ${cat.categoryId}, score ${cat.score.toFixed(3)}${tag}`;
+                `${cat.path.map((p: any) => p.title).join(" > ")}: id ${cat.categoryId}`;
 
             result.leafCategories.forEach((cat: any) => lines.push(format(cat)));
 
