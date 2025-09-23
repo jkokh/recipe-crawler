@@ -1,27 +1,22 @@
-// process.ts
 import { iterate, prisma } from "../../lib/iterator";
-
+import { RecipeUrl } from "./types";
 import { ClaudeBatchProvider } from "../../ai-providers/claude-batch";
-import {RecipeJson, RecipeUrl} from "../../types";
+import { RecipeJson } from "../../types";
 import { appendFileSync } from "fs";
 
 const claude = new ClaudeBatchProvider();
 
 function makePrompt(title: string): string {
-    return `Rewrite this recipe TITLE to be neutral and objective.
+    return `Rephrase this recipe image alt text: ${title}
 
 RULES (apply silently):
-• Remove first-person or family references (I, my, our, we, grandma, mom, etc.).
-• Do NOT add new adjectives or descriptors that are not in the original text
-  (e.g., classic, easy, delicious, amazing, special, ultimate).
-• Keep only the factual elements already present (ingredients, numbers, dish name).
-• Use natural phrasing in Title Case.
-• Output ONE line of plain text only — no notes, no formatting, no newlines (\\n or \\r).
-
-TITLE:
-${title}
-`;
+- Output only the rephrased sentence
+- No comments, notes, or explanations
+- Keep it concise and natural
+- Use correct grammar and capitalization
+- Do not add details not in the original`;
 }
+
 
 export async function processRecipes() {
     const batchIdsFile = 'batch-ids.txt';
@@ -30,22 +25,26 @@ export async function processRecipes() {
         .select({
             id: true,
             recipeId: true,
-            recipeUrl: true
+            recipeUrl: true,
+            json: true,
         })
         .where({
         })
         .orderBy({ id: 'asc' })
         .startPosition(1)
-        .perPage(40)
+        .perPage(50)
         .entityName("recipes")
         .getPageResults(async (recipes: RecipeUrl[]) => {
             try {
-                const requests = recipes.map((recipe) => {
-                    const json = recipe.jsonAltered as RecipeJson;
-                    return {
-                        customId: recipe.id.toString(),
-                        prompt: makePrompt(json.title)
-                    };
+                const requests: { customId: string; prompt: string }[] = [];
+                recipes.forEach((recipe) => {
+                    const json = recipe.json as RecipeJson;
+                    json.images!.forEach((img, index) => {
+                        const customId = recipe.id.toString() + '_' + index;
+                        requests.push({
+                            customId, prompt: makePrompt(img.alt)
+                        });
+                    });
                 });
                 const batchId = await claude.submitBatch(requests);
                 const logEntry = `${batchId}\n`;
@@ -58,6 +57,7 @@ export async function processRecipes() {
             } catch (err: any) {
                 console.error(`Error processing recipe batch:`, err?.message ?? err);
 
+                // Log the error to file as well
                 const errorEntry = `${new Date().toISOString()} - ERROR: ${err?.message ?? err}\n`;
                 try {
                     appendFileSync(batchIdsFile, errorEntry);

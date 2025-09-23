@@ -1,24 +1,22 @@
 import * as cheerio from "cheerio";
-import {Paragraph, Recipe} from "../types";
-import {containsStopPhrase, getImageIds, getSimplyDataSrc, hasLinks} from "./parserUtils";
+import {Paragraph} from "../types";
+import {getImageIds, getSimplyDataSrc, hasLinks} from "./parserUtils";
+import {Source} from "@prisma/client";
 
-export interface ParagraphsResult {
-    data: Paragraph[] | null;
-    needsReview: boolean;
-}
 
-export const getParagraphs = ($article: cheerio.Cheerio, recipe: Recipe): ParagraphsResult => {
+export type ParagraphsResult = Paragraph[] | null;
+
+export const getParagraphs = ($article: cheerio.Cheerio, source: Source): ParagraphsResult => {
     const $ = cheerio.load($article[0]);
 
     const $paragraphs = $('.article-content-container');
 
     if (!$paragraphs.length) {
-        return { data: null, needsReview: false };
+        return null;
     }
 
     let data: Paragraph[] = [];
     let exit = false;
-    let needsReview = false;
 
     $('*[id^="mntl-sc-block_"]').each((index, element) => {
         const paragraph: Paragraph = {};
@@ -80,7 +78,7 @@ export const getParagraphs = ($article: cheerio.Cheerio, recipe: Recipe): Paragr
                 paragraph.list = list;
             }
         }
-        const images = getImageIds(getSimplyDataSrc($(element)), recipe);
+        const images = getImageIds(getSimplyDataSrc($(element)), source);
 
         if (images.length > 0) {
             paragraph.images = images;
@@ -101,5 +99,5 @@ export const getParagraphs = ($article: cheerio.Cheerio, recipe: Recipe): Paragr
         data.pop();
     }
 
-    return { data: data.length ? data : null, needsReview };
+    return data.length ? data : null;
 }

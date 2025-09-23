@@ -1,10 +1,11 @@
-import { getPrompt } from "../../pipeline/utils";
-import { pipeline } from "../../pipeline/pipeline";
 import { prompts } from "./prompts";
 
-import {OllamaProvider} from "../../providers/ollama";
 import {extractJsonArray} from "../tags/processors/processTags";
-import {GPTProvider} from "../../providers/gpt";
+
+import {GPTProvider} from "../../../ai-providers/gpt";
+import {getPrompt} from "../../../ai-pipeline/utils";
+import {pipeline} from "../../../ai-pipeline/pipeline";
+
 
 export async function aiPipeline(recipe: any): Promise<string[]> {
     const ollama = new GPTProvider({

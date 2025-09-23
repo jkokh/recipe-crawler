@@ -1,10 +1,11 @@
-import { iterate, prisma } from '../../iterator';
 import { Prisma } from "@prisma/client";
 import {Ingredient, parseIngredients} from "./parser";
 import {ensureIngredientId, normalizeIngredientName} from "./ensureIngredient";
 import {extractIngredientTextsFromArticle} from "./extract";
 import {findIngredientId, LoadedIng, preloadIngredients} from "./ingredientMatch";
 import {aiPipeline} from "./ai-pipeline";
+import {iterate, prisma} from "../../../lib/iterator";
+import {Recipe} from "../../../types";
 
 type Source =  'DOM' | 'TEXT' | 'GPT' | 'OLLAMA';
 
@@ -15,21 +16,6 @@ type Row = {
     source: Source;
 };
 
-export type Recipe = Prisma.RecipeGetPayload<{
-    select: {
-        id: true
-        title: true
-        description: true
-        ingredients: true
-        recipeUrl: {
-            select: {
-                htmlClean: true
-                htmlContent: true
-                json: true
-            }
-        }
-    }
-}>
 
 let totalParsed = 0;
 let totalMissing = 0;
@@ -71,14 +57,14 @@ export async function process() {
             const rows: Row[] = [];
 
             const html = recipe.recipeUrl?.htmlContent ?? "";
-            const jsonObj = (() => { try { return JSON.parse(recipe.recipeUrl?.json ?? "null"); } catch { return null; } })();
+            const jsonObj = (() => { try { return recipe.recipeUrl!.json ?? null; } catch { return null; } })();
 
             const norm255 = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 255);
 
             const pushUnique = (ingredientId: number | null, text: string, source: Source) => {
                 const t = norm255(text);
                 if (!t) return;
-                rows.push({ recipeId: recipe.id, ingredientId, text: t, source });
+                rows.push({ recipeId: recipe.id, ingredientId: Number(ingredientId), text: t, source });
             };
 
             const addFromParsed = async (ings: Ingredient[], source: Source) => {

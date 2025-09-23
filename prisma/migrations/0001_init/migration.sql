@@ -90,20 +90,6 @@ CREATE TABLE `recipe` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `recipe_images` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `recipe_id` INTEGER NOT NULL,
-    `alt_text` VARCHAR(1024) NULL,
-    `order` INTEGER NOT NULL DEFAULT 0,
-    `step_id` INTEGER NULL,
-    `main` BOOLEAN NOT NULL DEFAULT false,
-
-    INDEX `idx_recipe_images_recipe_id`(`recipe_id`),
-    INDEX `idx_recipe_images_step_order`(`step_id`, `order`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `recipe_translation` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `recipe_id` INTEGER NOT NULL,
@@ -191,27 +177,6 @@ CREATE TABLE `nutrition_translation` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `recipe_urls` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `recipe_url` VARCHAR(191) NOT NULL,
-    `recipe_date` DATETIME(3) NULL,
-    `html_content` LONGTEXT NULL,
-    `html_clean` LONGTEXT NULL,
-    `json` LONGTEXT NULL,
-    `recipe_id` INTEGER NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `json_altered` JSON NULL,
-    `json_altered_history` JSON NULL,
-    `json_history` JSON NULL,
-    `batch_id` JSON NULL,
-
-    UNIQUE INDEX `recipe_urls_recipe_url_key`(`recipe_url`),
-    UNIQUE INDEX `recipe_urls_recipe_id_key`(`recipe_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `recipe_url_images` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `recipe_url_id` INTEGER NOT NULL,
@@ -247,6 +212,52 @@ CREATE TABLE `recipe_meta` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `phrases` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `hash` VARCHAR(64) NOT NULL,
+    `text` LONGTEXT NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `phrases_hash_key`(`hash`),
+    INDEX `phrases_hash_idx`(`hash`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `sources` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `recipe_url` VARCHAR(191) NOT NULL,
+    `recipe_date` DATETIME(3) NULL,
+    `html_content` LONGTEXT NULL,
+    `recipe_id` INTEGER NULL,
+    `batch_id` JSON NULL,
+    `json` JSON NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `recipe_urls_recipe_id_key`(`recipe_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `source_images` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `recipe_id` INTEGER NOT NULL,
+    `alt` VARCHAR(1024) NULL,
+    `order` INTEGER NOT NULL DEFAULT 0,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `is_lead` BOOLEAN NOT NULL DEFAULT false,
+    `source_id` INTEGER NULL,
+    `stable_id` CHAR(40) NULL,
+    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `url` TEXT NULL,
+
+    INDEX `source_images_source_id_idx`(`source_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `categories` ADD CONSTRAINT `categories_parentId_fkey` FOREIGN KEY (`parentId`) REFERENCES `categories`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -261,12 +272,6 @@ ALTER TABLE `recipe_tag_link` ADD CONSTRAINT `recipe_tag_link_tagId_fkey` FOREIG
 
 -- AddForeignKey
 ALTER TABLE `ingredient_translation` ADD CONSTRAINT `ingredient_translation_ingredient_id_fkey` FOREIGN KEY (`ingredient_id`) REFERENCES `ingredient`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `recipe_images` ADD CONSTRAINT `recipe_images_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `recipe_images` ADD CONSTRAINT `recipe_images_step_id_fkey` FOREIGN KEY (`step_id`) REFERENCES `recipe_step`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `recipe_translation` ADD CONSTRAINT `recipe_translation_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -293,14 +298,20 @@ ALTER TABLE `nutrition` ADD CONSTRAINT `nutrition_recipe_id_fkey` FOREIGN KEY (`
 ALTER TABLE `nutrition_translation` ADD CONSTRAINT `nutrition_translation_nutrition_id_fkey` FOREIGN KEY (`nutrition_id`) REFERENCES `nutrition`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `recipe_urls` ADD CONSTRAINT `recipe_urls_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `recipe_url_images` ADD CONSTRAINT `recipe_images_recipe_url_id_fkey` FOREIGN KEY (`recipe_url_id`) REFERENCES `recipe_urls`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `recipe_url_images` ADD CONSTRAINT `recipe_images_recipe_url_id_fkey` FOREIGN KEY (`recipe_url_id`) REFERENCES `sources`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `recipe_categories` ADD CONSTRAINT `recipe_categories_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `recipe_categories` ADD CONSTRAINT `recipe_categories_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `recipe_meta` ADD CONSTRAINT `recipe_meta_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sources` ADD CONSTRAINT `recipe_urls_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `recipe`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `source_images` ADD CONSTRAINT `source_images_source_id_fkey` FOREIGN KEY (`source_id`) REFERENCES `sources`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 

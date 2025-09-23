@@ -59,11 +59,6 @@ async function downloadSingleImage(img: any, baseDir: string): Promise<{ success
         await fs.mkdir(folder, { recursive: true });
         await downloadImageWithPuppeteer(img.imageUrl, filePath, img.recipeUrl.recipeUrl);
 
-        // Mark as valid after successful download
-        await prisma.recipeImage.update({
-            where: { id: img.id },
-            data: { valid: true }
-        });
 
         console.log(`[DOWNLOADED] ${filePath}`);
         return { success: true };

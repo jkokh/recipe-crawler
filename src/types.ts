@@ -7,10 +7,9 @@ export type RecipeJson = {
     paragraphs: Paragraph[] | null;
     steps: Step[] | null;
     meta?: RecipeMeta | null;
-    needsReview?: boolean;
     categories: number[];
     tags?: string[];
-    images?: number[];
+    images: ImagesParsed[] | null;
 }
 
 export type Batch = {
@@ -29,7 +28,7 @@ export type Recipe = Prisma.RecipeGetPayload<{
         seo: true;
         createdAt: true;
         updatedAt: true;
-        recipeUrl: { select: {
+        sources: { select: {
                 id: true,
                 json: true,
                 recipeUrl: true,
@@ -76,5 +75,49 @@ export type Recipe = Prisma.RecipeGetPayload<{
                 order: true;
             };
         };
+    };
+}>;
+
+
+export type ImagesParsed = {
+    id?: number;
+    stableId: string;
+    url: string;
+    alt: string;
+    lead: boolean;
+}
+
+export type RecipeUrl = Prisma.RecipeGetPayload<{
+    select: {
+        id: true,
+        recipeId: true,
+        recipeUrl: true,
+        json: true,
+        batchId: true,
+        jsonAltered: true,
+        recipe: {
+            select: {
+                title: true
+            }
+        }
+    };
+}>;
+
+export type Source = Prisma.RecipeGetPayload<{
+    select: {
+        id: true,
+        recipeId: true,
+        recipeUrl: true,
+        json: true,
+        batchId: true,
+        jsonAltered: true,
+        htmlContent: true,
+        images: true,
+        recipe: {
+            select: {
+                id: true,
+                title: true
+            }
+        }
     };
 }>;

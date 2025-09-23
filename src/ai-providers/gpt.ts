@@ -49,8 +49,7 @@ export class GPTProvider implements AIProvider {
       prompt: string | any,
       model?: string,
       system?: string,
-      options?: AIRequestOptions,
-      jsonStructure?: any
+      options?: AIRequestOptions
   ): Promise<T> {
     try {
       let promptText = typeof prompt === "string" ? prompt : JSON.stringify(prompt);
@@ -58,11 +57,11 @@ export class GPTProvider implements AIProvider {
       // Truncate input if it exceeds limit
       promptText = this.truncateText(promptText, this.maxInputLength);
 
-      const structure = jsonStructure ?? this.returnJsonStructure;
+      /*const structure = jsonStructure ?? this.returnJsonStructure;
       if (structure) {
         const structureString = typeof structure === "string" ? structure : JSON.stringify(structure);
         promptText += `\n\nPlease return a JSON response following this structure: ${structureString}`;
-      }
+      }*/
 
       const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
 
@@ -84,9 +83,9 @@ export class GPTProvider implements AIProvider {
       };
 
       // Add response format if structure is provided
-      if (structure) {
+/*      if (structure) {
         requestParams.response_format = { type: "json_object" };
-      }
+      }*/
 
       const response = await this.client.chat.completions.create(requestParams);
 
@@ -97,7 +96,7 @@ export class GPTProvider implements AIProvider {
       }
 
       try {
-        return JSON.parse(text);
+        return text as T;
       } catch (parseError) {
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {

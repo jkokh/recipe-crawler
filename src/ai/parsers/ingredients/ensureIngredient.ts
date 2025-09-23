@@ -1,6 +1,6 @@
-import {prisma} from "../../iterator";
 import {buildSlug} from "../../../utils";
 import pluralize from "pluralize";
+import {prisma} from "../../../lib/iterator";
 
 const STOPWORDS = new Set([
     // General language
@@ -64,7 +64,7 @@ export function isValidIngredientName(name: string): boolean {
 }
 
 
-export async function ensureIngredientId(name: string): Promise<number | null> {
+export async function ensureIngredientId(name: string): Promise<bigint | null> {
     name = cleanIngredientName(name);
     name = singularizeWords(normalizeIngredientName(name)); // normalize before validating
     if (!isValidIngredientName(name)) return null;          // validate after normalization

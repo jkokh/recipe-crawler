@@ -95,32 +95,16 @@ model Recipe {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   seo          String?             @db.VarChar(255)
-  categories   RecipeCategory[]
   nutritions   Nutrition[]
-  images       RecipeImage[]
+  categories   RecipeCategory[]
   ingredients  RecipeIngredient[]
   RecipeMeta   RecipeMeta[]
   steps        RecipeStep[]
   tags         RecipeTagLink[]
   translations RecipeTranslation[]
-  recipeUrl    RecipeUrl?
+  sources      Source?
 
   @@map("recipe")
-}
-
-model RecipeImage {
-  id       Int         @id @default(autoincrement())
-  recipeId Int         @map("recipe_id")
-  altText  String?     @map("alt_text") @db.VarChar(1024)
-  order    Int         @default(0)
-  stepId   Int?        @map("step_id")
-  main     Boolean     @default(false) @map("main")
-  recipe   Recipe      @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  step     RecipeStep? @relation(fields: [stepId], references: [id], onDelete: Cascade)
-
-  @@index([recipeId], map: "idx_recipe_images_recipe_id")
-  @@index([stepId, order], map: "idx_recipe_images_step_order")
-  @@map("recipe_images")
 }
 
 model RecipeTranslation {
@@ -172,7 +156,6 @@ model RecipeStep {
   source                source                  @default(DOM)
   textAlt               String?                 @db.Text
   titleAlt              String?                 @db.VarChar(255)
-  images                RecipeImage[]
   recipe                Recipe                  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   RecipeStepTranslation RecipeStepTranslation[]
 
@@ -215,33 +198,14 @@ model NutritionTranslation {
   @@map("nutrition_translation")
 }
 
-model RecipeUrl {
-  id          Int              @id @default(autoincrement())
-  recipeUrl   String           @unique @map("recipe_url")
-  recipeDate  DateTime?        @map("recipe_date")
-  htmlContent String?          @map("html_content") @db.LongText
-  recipeId    Int?             @unique @map("recipe_id")
-  json        Json?            @map("json")
-  jsonHistory Json?            @map("json_history")
-  images      RecipeUrlImage[]
-  batchId     Json?            @map("batch_id")
-  createdAt   DateTime         @default(now()) @map("created_at")
-  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
-
-  // Relations
-  recipe Recipe? @relation(fields: [recipeId], references: [id])
-
-  @@map("recipe_urls")
-}
-
 model RecipeUrlImage {
-  id        Int       @id @default(autoincrement())
-  recipeId  Int       @map("recipe_url_id")
-  imageUrl  String    @map("image_url") @db.Text
-  altText   String?   @map("alt_text") @db.VarChar(1024)
-  valid     Boolean   @default(true) @map("valid")
-  type      String?   @map("type")
-  recipeUrl RecipeUrl @relation(fields: [recipeId], references: [id], map: "recipe_images_recipe_url_id_fkey")
+  id       Int     @id @default(autoincrement())
+  recipeId Int     @map("recipe_url_id")
+  imageUrl String  @map("image_url") @db.Text
+  altText  String? @map("alt_text") @db.VarChar(1024)
+  valid    Boolean @default(true) @map("valid")
+  type     String? @map("type")
+  sources  Source  @relation(fields: [recipeId], references: [id], map: "recipe_images_recipe_url_id_fkey")
 
   @@index([recipeId], map: "idx_recipe_images_recipe_url_id")
   @@map("recipe_url_images")
@@ -250,9 +214,8 @@ model RecipeUrlImage {
 model RecipeCategory {
   recipeId   Int
   categoryId Int
-
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@id([recipeId, categoryId])
   @@index([categoryId, recipeId])
@@ -271,6 +234,54 @@ model RecipeMeta {
   @@unique([recipeId, key])
   @@index([recipeId], map: "idx_recipe_meta_recipe_id")
   @@map("recipe_meta")
+}
+
+model Phrase {
+  id        BigInt   @id @default(autoincrement())
+  hash      String   @unique @db.VarChar(64)
+  text      String   @db.LongText
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([hash])
+  @@map("phrases")
+}
+
+model Source {
+  id             Int              @id @default(autoincrement()) @map("id")
+  recipeUrl      String           @map("recipe_url")
+  recipeDate     DateTime?        @map("recipe_date")
+  htmlContent    String?          @map("html_content") @db.LongText
+  recipeId       Int?             @unique(map: "recipe_urls_recipe_id_key") @map("recipe_id")
+  batchId        Json?            @map("batch_id")
+  json           Json?            @map("json")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @default(now()) @updatedAt @map("updated_at")
+  recipeUrlImage RecipeUrlImage[]
+  SourceImage    SourceImage[]
+  recipe         Recipe?          @relation(fields: [recipeId], references: [id], map: "recipe_urls_recipe_id_fkey")
+
+  @@map("sources")
+}
+
+model SourceImage {
+  id        Int      @id @default(autoincrement()) @map("id")
+  recipe_id Int
+  alt       String?  @map("alt") @db.VarChar(1024)
+  order     Int      @default(0) @map("order")
+  sourceId  Int?     @map("source_id")
+  isLead    Boolean  @default(false) @map("is_lead")
+  stableId  String?  @map("stable_id") @db.Char(40)
+  url       String?  @map("url") @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Source Source? @relation(fields: [sourceId], references: [id])
+
+  @@unique([sourceId, stableId])
+  @@index([sourceId])
+  @@index([order], map: "idx_recipe_images_step_order")
+  @@map("source_images")
 }
 
 enum source {

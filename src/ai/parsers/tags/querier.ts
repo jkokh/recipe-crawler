@@ -1,9 +1,9 @@
-import { getPrompt } from "../../pipeline/utils";
-import { pipeline } from "../../pipeline/pipeline";
 import { prompts } from "./prompts";
 import {extractJsonArray} from "./processors/processTags";
 import {validateTags} from "./validators/validateTags";
-import {GPTProvider} from "../../providers/gpt";
+import {GPTProvider} from "../../../ai-providers/gpt";
+import {pipeline} from "../../../ai-pipeline/pipeline";
+import {getPrompt} from "../../../ai-pipeline/utils";
 
 export async function querier(recipe: any): Promise<string[]> {
     const gpt = new GPTProvider({

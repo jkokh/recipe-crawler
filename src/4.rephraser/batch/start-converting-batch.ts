@@ -7,9 +7,7 @@ export async function process() {
     await iterate(prisma.recipeUrl)
         .select({
             id: true,
-            articleBatchId: true,
             json: true,
-            jsonAltered: true,
             batchId: true,
         })
         .where({

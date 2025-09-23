@@ -1,8 +1,10 @@
 import * as cheerio from "cheerio";
-import {Recipe, RecipeMeta} from "../types";
+import {RecipeMeta} from "../types";
+import {Recipe} from "../../types";
+import {Source} from "@prisma/client";
 
 
-export const getRecipeMeta = ($article: cheerio.Cheerio, recipe: Recipe): RecipeMeta | null => {
+export const getRecipeMeta = ($article: cheerio.Cheerio, source: Source): RecipeMeta | null => {
     const $ = cheerio.load($article[0]);
 
     const $recipeBlock = $('.recipe-block__meta');
