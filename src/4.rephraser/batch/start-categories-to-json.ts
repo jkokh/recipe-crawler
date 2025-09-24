@@ -17,9 +17,9 @@ export async function process() {
         .perPage(50)
         .entityName("recipes")
         .forEachAsync(async (recipe: Recipe) => {
-            const json = recipe.recipeUrl!.json as RecipeJson;
+            const json = recipe.sources!.json as RecipeJson;
             json.categories = recipe.categories.map(c => c.categoryId);
-            await prisma.recipeUrl.update({
+            await prisma.source.update({
                 where: { recipeId: recipe.id },
                 data: {
                     json: json as Prisma.InputJsonValue

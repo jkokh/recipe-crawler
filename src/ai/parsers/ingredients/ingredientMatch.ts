@@ -1,7 +1,8 @@
-import { prisma } from "../../iterator";
+import {prisma} from "../../../lib/iterator";
+
 
 export type LoadedIng = {
-    id: number;
+    id: bigint;
     name: string;
     key: string;     // normalized
     altKey: string;  // hyphens -> spaces
@@ -35,7 +36,7 @@ export async function preloadIngredients(): Promise<LoadedIng[]> {
     return list;
 }
 
-export function findIngredientId(text: string, list: LoadedIng[]): number | null {
+export function findIngredientId(text: string, list: LoadedIng[]): bigint | null {
     const hay1 = ` ${norm(text)} `;
     const hay2 = ` ${norm(text).replace(/-/g, " ")} `;
     for (const it of list) {

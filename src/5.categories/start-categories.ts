@@ -36,7 +36,7 @@ export async function process(): Promise<void> {
             .forEachAsync(async (recipe: Recipe) => {
                 const categoryString = processor.getCategories(recipe);
 
-                const json = recipe.recipeUrl!.json as RecipeJson;
+                const json = recipe.sources!.json as RecipeJson;
                 const result = await querier(json, categoryString);
 
                 console.log(`\n=== ${recipe.title} ===`);

@@ -1,10 +1,9 @@
 import { prompts } from "./prompts";
 
 import {extractJsonArray} from "../tags/processors/processTags";
-
-import {GPTProvider} from "../../../ai-providers/gpt";
-import {getPrompt} from "../../../ai-pipeline/utils";
-import {pipeline} from "../../../ai-pipeline/pipeline";
+import {GPTProvider} from "../../../lib/ai-providers/gpt";
+import {pipeline} from "../../../lib/ai-pipeline/pipeline";
+import {getPrompt} from "../../../lib/ai-pipeline/utils";
 
 
 export async function aiPipeline(recipe: any): Promise<string[]> {

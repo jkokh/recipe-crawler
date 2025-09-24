@@ -37,8 +37,7 @@ export async function saveImages(
                         url: img.url,
                         alt: img.alt,
                         isLead: img.lead,
-                        order: index,
-                        recipe_id: 0
+                        order: index
                     },
                     update: {
                         url: img.url,

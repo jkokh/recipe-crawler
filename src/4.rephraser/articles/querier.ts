@@ -1,7 +1,8 @@
 import { prompts } from "./prompts";
-import {ClaudeProvider} from "../../ai-providers/claude";
-import {getPrompt} from "../../ai-pipeline/utils";
-import {pipeline} from "../../ai-pipeline/pipeline";
+import {ClaudeProvider} from "../../lib/ai-providers/claude";
+import {getPrompt} from "../../lib/ai-pipeline/utils";
+import {pipeline} from "../../lib/ai-pipeline/pipeline";
+
 
 
 

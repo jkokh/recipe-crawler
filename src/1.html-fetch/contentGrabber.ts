@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { fetchHtmlWithPuppeteer, launchBrowser } from '../crawler/fetchHtmlPuppeteer';
+import {fetchHtmlWithPuppeteer, launchBrowser} from "../lib/fetchHtmlPuppeteer";
 
 const prisma = new PrismaClient();
 
@@ -8,7 +8,7 @@ function sleep(ms: number) {
 }
 
 async function main() {
-    const recipeUrls = await prisma.recipeUrl.findMany({
+    const recipeUrls = await prisma.source.findMany({
         where: {
             OR: [
                 { htmlContent: null },
@@ -25,7 +25,7 @@ async function main() {
             console.log(`Fetching: ${recipe.recipeUrl}`);
             const html = await fetchHtmlWithPuppeteer(recipe.recipeUrl, browser);
 
-            await prisma.recipeUrl.update({
+            await prisma.source.update({
                 where: { id: recipe.id },
                 data: { htmlContent: html.html },
             });

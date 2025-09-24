@@ -1,7 +1,7 @@
 // process.ts
 import { iterate, prisma } from "../../lib/iterator";
 import { RecipeUrl } from "./types";
-import {ClaudeBatchProvider} from "../../ai-providers/claude-batch";
+import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
 
 type Paragraph = { text?: string; [k: string]: any };
 
@@ -28,7 +28,7 @@ ${text}`;
 
 
 export async function process() {
-    await iterate(prisma.recipeUrl)
+    await iterate(prisma.source)
         .select({
             id: true,
             recipeId: true,
@@ -70,7 +70,7 @@ export async function process() {
                 // submit a batch per recipe
                 const batchId = await claude.submitBatch(requests);
 
-                await prisma.recipeUrl.update({
+                await prisma.source.update({
                     where: { id: recipe.id },
                     data: { batchId },
                 });

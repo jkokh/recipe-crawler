@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import "dotenv/config";
-import {AIProvider, AIRequestOptions} from "../ai/types";
+import {AIProvider, AIRequestOptions} from "../../ai/types";
 
 const MODEL = "gpt-4.1-nano";
 

@@ -1,9 +1,10 @@
 import { prompts } from "./prompts";
 import {extractJsonArray} from "./processors/processTags";
 import {validateTags} from "./validators/validateTags";
-import {GPTProvider} from "../../../ai-providers/gpt";
-import {pipeline} from "../../../ai-pipeline/pipeline";
-import {getPrompt} from "../../../ai-pipeline/utils";
+import {GPTProvider} from "../../../lib/ai-providers/gpt";
+import {pipeline} from "../../../lib/ai-pipeline/pipeline";
+import {getPrompt} from "../../../lib/ai-pipeline/utils";
+
 
 export async function querier(recipe: any): Promise<string[]> {
     const gpt = new GPTProvider({

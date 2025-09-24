@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import {buildSlug, toDisplayName} from "../../../utils";
+import {buildSlug, toDisplayName} from "../../../lib/utils";
 
 
 export class TagService {

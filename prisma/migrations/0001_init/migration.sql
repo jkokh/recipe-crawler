@@ -244,17 +244,19 @@ CREATE TABLE `sources` (
 -- CreateTable
 CREATE TABLE `source_images` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `recipe_id` INTEGER NOT NULL,
-    `alt` VARCHAR(1024) NULL,
-    `order` INTEGER NOT NULL DEFAULT 0,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `is_lead` BOOLEAN NOT NULL DEFAULT false,
     `source_id` INTEGER NULL,
     `stable_id` CHAR(40) NULL,
-    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `url` TEXT NULL,
+    `alt` VARCHAR(1024) NULL,
+    `is_lead` BOOLEAN NOT NULL DEFAULT false,
+    `order` INTEGER NOT NULL DEFAULT 0,
+    `downloaded` BOOLEAN NOT NULL DEFAULT false,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `source_images_source_id_idx`(`source_id`),
+    INDEX `idx_recipe_images_step_order`(`order`),
+    UNIQUE INDEX `source_images_source_id_stable_id_key`(`source_id`, `stable_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

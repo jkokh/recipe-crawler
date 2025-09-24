@@ -16,8 +16,8 @@ export async function process() {
         .entityName('recipes')
         .forEachAsync(async (recipe: Recipe) => {
 
-            if (recipe.steps.length && recipe.recipeUrl?.json) {
-                const json = recipe.recipeUrl.json as RecipeJson;
+            if (recipe.steps.length && recipe.sources?.json) {
+                const json = recipe.sources.json as RecipeJson;
 
                 if (json.steps) {
                     // Update steps with alt text
@@ -30,7 +30,7 @@ export async function process() {
                     });
 
                     // Update database
-                    await prisma.recipeUrl.updateMany({
+                    await prisma.source.updateMany({
                         where: { recipeId: recipe.id },
                         data: { json: json as Prisma.InputJsonValue }
                     });

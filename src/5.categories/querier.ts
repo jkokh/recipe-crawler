@@ -1,9 +1,8 @@
-
 import { prompts } from "./prompts";
-import {GPTProvider} from "../ai-providers/gpt";
-import {pipeline} from "../ai-pipeline/pipeline";
 import {RecipeJson} from "../types";
 import {validate} from "./validate";
+import {GPTProvider} from "../lib/ai-providers/gpt";
+import {pipeline} from "../lib/ai-pipeline/pipeline";
 
 
 export async function querier(recipeJson: RecipeJson, categories: string): Promise<{ categories: number[] }> {
@@ -13,7 +12,6 @@ export async function querier(recipeJson: RecipeJson, categories: string): Promi
 
     delete recipeJson.meta;
     delete recipeJson.nutrition;
-    delete recipeJson.needsReview;
 
     const prmpt = prompts[0].replace('<%data%>', JSON.stringify(recipeJson)).replace('<%categories%>', categories);
 

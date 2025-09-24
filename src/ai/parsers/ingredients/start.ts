@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import {Ingredient, parseIngredients} from "./parser";
 import {ensureIngredientId, normalizeIngredientName} from "./ensureIngredient";
 import {extractIngredientTextsFromArticle} from "./extract";
@@ -56,12 +55,12 @@ export async function process() {
             }
             const rows: Row[] = [];
 
-            const html = recipe.recipeUrl?.htmlContent ?? "";
-            const jsonObj = (() => { try { return recipe.recipeUrl!.json ?? null; } catch { return null; } })();
+            const html = recipe.sources?.htmlContent ?? "";
+            const jsonObj = (() => { try { return recipe.sources!.json ?? null; } catch { return null; } })();
 
             const norm255 = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 255);
 
-            const pushUnique = (ingredientId: number | null, text: string, source: Source) => {
+            const pushUnique = (ingredientId: bigint | null, text: string, source: Source) => {
                 const t = norm255(text);
                 if (!t) return;
                 rows.push({ recipeId: recipe.id, ingredientId: Number(ingredientId), text: t, source });

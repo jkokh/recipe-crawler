@@ -1,12 +1,11 @@
-import {Recipe} from "./types";
 import {iterate, prisma} from "../../../lib/iterator";
-//import {NutritionJSON, NutritionRow, Recipe} from "./types";
+import {Recipe} from "@prisma/client";
 
 let totalParsed = 0;
 let totalMissing = 0;
 
 async function syncRecipeImagesFromUrl(recipe: Recipe) {
-    const src = recipe.recipeUrl?.images ?? [];
+    const src = recipe.sources?.images ?? [];
     if (!src.length) return false;
 
     await prisma.$transaction(
@@ -15,18 +14,16 @@ async function syncRecipeImagesFromUrl(recipe: Recipe) {
             if (img.type && img.type!.includes('LEAD')) {
                 main = true;
             }
-            return prisma.recipeImage.upsert({
+            return prisma.sourceImage.upsert({
                 where: {id: img.id},                   // ← keep same id as recipe_url_images.id
                 update: {
-                    recipeId: recipe.id,
-                    altText: img.altText ?? null,
-                    main
+                    alt: img.altText ?? null,
+                    isLead: main
                 },
                 create: {
-                    id: img.id,                            // ← explicit id (allowed with MySQL AUTO_INCREMENT)
-                    recipeId: recipe.id,
-                    altText: img.altText ?? null,
-                    main
+                    id: img.id,
+                    alt: img.altText ?? null,
+                    isLead: main
                 },
             });
         }

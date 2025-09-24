@@ -1,6 +1,6 @@
-import {buildSlug} from "../../../utils";
 import pluralize from "pluralize";
 import {prisma} from "../../../lib/iterator";
+import {buildSlug} from "../../../lib/utils";
 
 const STOPWORDS = new Set([
     // General language

@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import "dotenv/config";
-import { AIProvider, AIRequestOptions } from "../ai/types";
+import {AIProvider, AIRequestOptions} from "../../ai/types";
 
 const MODEL = "claude-3-5-haiku-20241022";
 

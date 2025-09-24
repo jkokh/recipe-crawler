@@ -1,9 +1,7 @@
 // process.ts
 import { iterate, prisma } from "../../lib/iterator";
 import { RecipeUrl } from "./types";
-import { ClaudeBatchProvider } from "../../ai-providers/claude-batch";
 import { RecipeJson } from "../../types";
-import { appendFileSync } from "fs";
 
 
 export async function processRecipes() {
@@ -11,7 +9,7 @@ export async function processRecipes() {
 
     let  totalCount = 0;
 
-    await iterate(prisma.recipeUrl)
+    await iterate(prisma.source)
         .select({
             id: true,
             recipeId: true,

@@ -6,3 +6,5 @@ node_modules
 /src/0.sitemap-parser/sitemaps/
 /src/image-parser/images/
 /src/ai/categories/.models/
+
+.DS_Store

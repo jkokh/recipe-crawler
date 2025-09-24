@@ -1,8 +1,8 @@
 import { iterate, prisma } from "../../lib/iterator";
 import { RecipeUrl } from "./types";
-import { ClaudeBatchProvider } from "../../ai-providers/claude-batch";
 import { RecipeJson } from "../../types";
 import { appendFileSync } from "fs";
+import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
 
 const claude = new ClaudeBatchProvider();
 
@@ -21,7 +21,7 @@ RULES (apply silently):
 export async function processRecipes() {
     const batchIdsFile = 'batch-ids.txt';
 
-    await iterate(prisma.recipeUrl)
+    await iterate(prisma.source)
         .select({
             id: true,
             recipeId: true,

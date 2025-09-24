@@ -1,10 +1,9 @@
 import { iterate, prisma } from "../../lib/iterator";
-import {Prisma, RecipeUrl} from "@prisma/client";
-import {Batch} from "../../types";
+import {Source} from "@prisma/client";
 
 
 export async function process() {
-    await iterate(prisma.recipeUrl)
+    await iterate(prisma.source)
         .select({
             id: true,
             json: true,
@@ -16,7 +15,7 @@ export async function process() {
         .startPosition(1)
         .perPage(50)
         .entityName("recipes")
-        .forEachAsync(async (recipe: RecipeUrl) => {
+        .forEachAsync(async (source: Source) => {
 
         });
     console.log("\x1b[32m%s\x1b[0m", "Result retrieval and JSON restoration complete");

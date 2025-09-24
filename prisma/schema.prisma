@@ -265,18 +265,18 @@ model Source {
 }
 
 model SourceImage {
-  id        Int      @id @default(autoincrement()) @map("id")
-  recipe_id Int
-  alt       String?  @map("alt") @db.VarChar(1024)
-  order     Int      @default(0) @map("order")
-  sourceId  Int?     @map("source_id")
-  isLead    Boolean  @default(false) @map("is_lead")
-  stableId  String?  @map("stable_id") @db.Char(40)
-  url       String?  @map("url") @db.Text
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id         Int      @id @default(autoincrement()) @map("id")
+  sourceId   Int?     @map("source_id")
+  stableId   String?  @map("stable_id") @db.Char(40)
+  url        String?  @map("url") @db.Text
+  alt        String?  @map("alt") @db.VarChar(1024)
+  isLead     Boolean  @default(false) @map("is_lead")
+  order      Int      @default(0) @map("order")
+  downloaded Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
 
-  Source Source? @relation(fields: [sourceId], references: [id])
+  source Source? @relation(fields: [sourceId], references: [id])
 
   @@unique([sourceId, stableId])
   @@index([sourceId])

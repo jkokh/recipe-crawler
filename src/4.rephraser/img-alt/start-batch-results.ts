@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import {ClaudeBatchProvider} from "../../ai-providers/claude-batch";
 import { readFileSync } from "fs";
 import {prisma} from "../../lib/iterator";
 import {RecipeJson} from "../../types";
+import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
 
 const claude = new ClaudeBatchProvider();
 
@@ -45,7 +45,7 @@ export async function process() {
                 for (const [recipeIdStr, imageResults] of Object.entries(resultsByRecipe)) {
                     const recipeId = parseInt(recipeIdStr);
 
-                    const recipe = await prisma.recipeUrl.findUnique({
+                    const recipe = await prisma.source.findUnique({
                         where: { id: recipeId }
                     });
 
@@ -68,7 +68,7 @@ export async function process() {
                             }
                         }
 
-                        await prisma.recipeUrl.update({
+                        await prisma.source.update({
                             where: { id: recipeId },
                             data: { json: json as any }
                         });

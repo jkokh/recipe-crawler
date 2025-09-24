@@ -1,4 +1,4 @@
-import {Ingredient, Nutrition, Paragraph, RecipeMeta, Step} from "./3.parser-all-to-json/types";
+import {Ingredient, Nutrition, Paragraph, RecipeMeta, Step} from "./2.parser-all-to-json/types";
 
 export type RecipeJson = {
     title: string;

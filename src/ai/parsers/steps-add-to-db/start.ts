@@ -27,7 +27,7 @@ export async function process() {
             if (recipe.steps && recipe.steps.length) {
                 return;
             }
-            let steps= (recipe.recipeUrl!.json as RecipeJson).steps;
+            let steps= (recipe.sources!.json as RecipeJson).steps;
             if (!steps || !steps.length) return;
             let source: Source = 'DOM';
 

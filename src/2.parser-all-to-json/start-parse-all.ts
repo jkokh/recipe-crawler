@@ -10,8 +10,9 @@ import {RecipeJson} from "../types";
 import {Prisma, Source} from "@prisma/client";
 import {parseImages} from "./modules/getImages";
 import {getRewrittenPhrase, storePhrase} from "./modules/parserUtils";
-import {GPTProvider} from "../ai-providers/gpt";
 import {saveImages} from "./modules/saveImages";
+import {GPTProvider} from "../lib/ai-providers/gpt";
+
 
 const gpt = new GPTProvider({
     returnJsonStructure: { header: "string", text: "string" }

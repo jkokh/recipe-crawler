@@ -1,5 +1,3 @@
-import {Recipe} from "./parsers/article/types";
-
 export const getImageIdsForTheStep = (stepImageUrls: string[], recipe: Recipe): number[] => {
     const recipeImages = recipe.recipeUrl?.images ?? [];
 

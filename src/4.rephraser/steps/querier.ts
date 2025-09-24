@@ -1,8 +1,7 @@
-
 import { prompts } from "./prompts";
-import {GPTProvider} from "../../ai-providers/gpt";
-import {getPrompt} from "../../ai-pipeline/utils";
-import {pipeline} from "../../ai-pipeline/pipeline";
+import {GPTProvider} from "../../lib/ai-providers/gpt";
+import {getPrompt} from "../../lib/ai-pipeline/utils";
+import {pipeline} from "../../lib/ai-pipeline/pipeline";
 
 
 export async function querier(data: any): Promise<any> {

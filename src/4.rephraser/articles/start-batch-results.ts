@@ -1,9 +1,9 @@
 // process.ts
 import { iterate, prisma } from "../../lib/iterator";
 import { RecipeUrl } from "./types";
-import {ClaudeBatchProvider} from "../../ai-providers/claude-batch";
 import {Prisma} from "@prisma/client";
 import {RecipeJson} from "../../types";
+import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
 
 type Paragraph = { text?: string; [k: string]: any };
 
@@ -16,7 +16,7 @@ function getIdByName(items: Item[], name: string): string | undefined {
 }
 
 export async function process() {
-    await iterate(prisma.recipeUrl)
+    await iterate(prisma.source)
         .select({
             id: true,
             batchId: true,
@@ -62,7 +62,7 @@ export async function process() {
                 const updatedJson: RecipeJson = { ...parsed, paragraphs: updatedParagraphs };
 
                 // Update the database with the new jsonAltered
-                await prisma.recipeUrl.update({
+                await prisma.source.update({
                     where: { id: recipe.id },
                     data: {
                         json: updatedJson as Prisma.InputJsonValue

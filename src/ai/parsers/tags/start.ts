@@ -1,10 +1,9 @@
-import { iterate, prisma } from '../../iterator';
 import { Prisma } from "@prisma/client";
 import {querier} from "./querier";
-import {extractFirstJsonArray, kebab} from "../../../utils";
 import {TagService} from "./TagService";
+import {iterate, prisma} from "../../../lib/iterator";
 
-export type Recipe = Prisma.RecipeUrlGetPayload<{
+export type Recipe = Prisma.SourceGetPayload<{
     select: {
         id: true
         json: true
@@ -17,7 +16,7 @@ export type Recipe = Prisma.RecipeUrlGetPayload<{
         }
     }
 }>
-const result: number[] = [];
+
 export async function processTags() {
 
 
@@ -33,7 +32,7 @@ export async function processTags() {
     const recipeIds = recipeIdsWithFewTags.map(r => r.id);
 
 // Then use those IDs in your iterator
-    return iterate(prisma.recipeUrl)
+    return iterate(prisma.source)
         .select({
             id: true,
             json: true,

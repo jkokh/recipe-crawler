@@ -1,6 +1,9 @@
 import { prompts } from "./prompts";
 import {extractJsonArray} from "./processors/processTags";
-import {OllamaProvider} from "../../../ai-providers/ollama";
+import {getPrompt} from "../../../lib/ai-pipeline/utils";
+import {pipeline} from "../../../lib/ai-pipeline/pipeline";
+import {OllamaProvider} from "../../../lib/ai-providers/ollama";
+
 
 export async function querier(recipe: any): Promise<string[]> {
     const ollama = new OllamaProvider({
