@@ -255,6 +255,7 @@ model Source {
   recipeId       Int?             @unique(map: "recipe_urls_recipe_id_key") @map("recipe_id")
   batchId        Json?            @map("batch_id")
   json           Json?            @map("json")
+  jsonHistory    Json?            @map("json_history")
   createdAt      DateTime         @default(now()) @map("created_at")
   updatedAt      DateTime         @default(now()) @updatedAt @map("updated_at")
   recipeUrlImage RecipeUrlImage[]

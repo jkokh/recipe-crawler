@@ -1,8 +1,8 @@
-DROP TRIGGER IF EXISTS trg_recipe_urls_json_history;
+DROP TRIGGER IF EXISTS trg_sources_json_history;
 DELIMITER $$
 
-CREATE TRIGGER trg_recipe_urls_json_history
-BEFORE UPDATE ON recipe_urls
+CREATE TRIGGER trg_sources_json_history
+BEFORE UPDATE ON sources
 FOR EACH ROW
 BEGIN
   /* Track changes for `json` -> `json_history` */
