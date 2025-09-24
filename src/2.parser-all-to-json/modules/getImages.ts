@@ -1,7 +1,5 @@
 import { ImagesParsed } from "../../types";
-import {Source} from "@prisma/client";
 import crypto from "node:crypto";
-import {getImageIds} from "./parserUtils";
 
 
 const sha1 = (s: string) => crypto.createHash("sha1").update(s).digest("hex");
@@ -22,9 +20,8 @@ export function stableIdFromUrl(raw: string): string {
 }
 
 
-export function parseImages($article: cheerio.Cheerio, source: Source): ImagesParsed[] | null {
+export function parseImages($article: cheerio.Cheerio): ImagesParsed[] {
     const images: ImagesParsed[] = [];
-
     $article.find("img").each((_, img) => {
 
         const url = (img as any).attribs["data-src"] ||
@@ -45,10 +42,5 @@ export function parseImages($article: cheerio.Cheerio, source: Source): ImagesPa
             }
         }
     });
-
-    if (images.length === 0) {
-        return null;
-    }
-
     return images;
 }

@@ -254,6 +254,7 @@ model Source {
   htmlContent    String?          @map("html_content") @db.LongText
   recipeId       Int?             @unique(map: "recipe_urls_recipe_id_key") @map("recipe_id")
   batchId        Json?            @map("batch_id")
+  jsonParsed     Json?            @map("json_parsed")
   json           Json?            @map("json")
   jsonHistory    Json?            @map("json_history")
   createdAt      DateTime         @default(now()) @map("created_at")

@@ -9,12 +9,10 @@ import {getRecipeMeta} from "./modules/getMeta";
 import {RecipeJson} from "../types";
 import {Prisma, Source} from "@prisma/client";
 import {parseImages} from "./modules/getImages";
-import {getRewrittenPhrase, storePhrase} from "./modules/parserUtils";
 import {saveImages} from "./modules/saveImages";
-import {GPTProvider} from "../lib/ai-providers/gpt";
 
 
-const gpt = new GPTProvider({
+/*const gpt = new GPTProvider({
     returnJsonStructure: { header: "string", text: "string" }
 });
 
@@ -24,8 +22,7 @@ function makePrompt(title: string): string {
 Do not include anything except the rewritten alt text.
 Keep it concise and natural.
 No comments or explanations. Return a rewritten string!`;
-}
-
+}*/
 
 export async function process() {
     await iterate(prisma.source)
@@ -35,7 +32,6 @@ export async function process() {
             json: true,
             htmlContent: true,
             recipeUrlImage: true
-
         })
         .where({
 
@@ -48,8 +44,9 @@ export async function process() {
             const $ = cheerio.load(html);
             const $article = $('article');
 
-            let images = parseImages($article, source);
-            images = images ?? [];
+            let images = parseImages($article);
+            images = await saveImages(images, source, prisma);
+
             const meta = getRecipeMeta($article, source);
             const title = getTitle($article, source);
             const ingredients = getIngredients($article);
@@ -57,8 +54,7 @@ export async function process() {
             const steps = getSteps($article, source);
             const paragraphs = getParagraphs($article, source);
 
-            const json = source.json as RecipeJson;
-            images = await Promise.all(images.map(async (img) => {
+            /*images = await Promise.all(images.map(async (img) => {
                 if (!img.alt) return img;
                 const phrase = await getRewrittenPhrase(img.alt);
                 if (phrase) {
@@ -73,16 +69,15 @@ export async function process() {
                     }
                 }
                 return img;
-            }));
-            images = await saveImages(images, source, prisma);
-            const recipeParsed: any = {
-                //title,
-                //ingredients: ingredients.data,
-                //nutrition,
-                //steps: steps.data,
-                //paragraphs,
-                //meta,
-                //categories: [],
+            }));*/
+            const jsonParsed: RecipeJson = {
+                title,
+                ingredients: ingredients.data,
+                nutrition,
+                steps: steps.data,
+                paragraphs,
+                meta,
+                categories: [],
                 images
             }
             await prisma.source.update({
@@ -90,11 +85,9 @@ export async function process() {
                     id: source.id
                 },
                 data: {
-                   // json: { ...recipeParsed,  ...json } as Prisma.InputJsonValue
-                    json: { ...json, ...recipeParsed } as Prisma.InputJsonValue
+                    jsonParsed: jsonParsed as Prisma.InputJsonValue
                 }
             });
-
         });
 
 }
