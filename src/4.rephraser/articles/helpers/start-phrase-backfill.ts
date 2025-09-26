@@ -1,9 +1,9 @@
 // process.ts
-import { iterate, prisma } from "../../lib/iterator";
-import { RecipeUrl } from "./types";
+import { iterate, prisma } from "../../../lib/iterator";
+import { RecipeUrl } from "../types";
 import {Prisma} from "@prisma/client";
-import {RecipeJson} from "../../types";
-import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
+import {RecipeJson} from "../../../types";
+import {ClaudeBatchProvider} from "../../../lib/ai-providers/claude-batch";
 
 type Paragraph = { text?: string; [k: string]: any };
 

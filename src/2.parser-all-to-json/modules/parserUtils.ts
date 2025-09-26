@@ -42,36 +42,6 @@ export function cryptoHash(str: string, algorithm: 'md5' | 'sha1' | 'sha256' = '
     return crypto.createHash(algorithm).update(str).digest('hex');
 }
 
-export async function getRewrittenPhrase(text: string): Promise<string | null> {
-    const hash = cryptoHash(text);
-    const phrase = await prisma.phrase.findUnique({
-        where: { hash }
-    });
-    if (!phrase) return null;
-    return phrase.text;
-}
-
-export async function storePhrase(oldText: string, newText: string): Promise<void> {
-    if (!oldText || oldText.trim().length === 0) return;
-    if (!newText || newText.trim().length === 0) return;
-
-    const hash = cryptoHash(oldText); // Hash from OLD string
-
-    try {
-        await prisma.phrase.upsert({
-            where: { hash },
-            create: {
-                hash,
-                text: newText.trim() // Store NEW string
-            },
-            update: {}, // Don't update if exists
-        });
-        console.log(`✅ Stored phrase with hash: ${hash.substring(0, 8)}... | "${oldText}" -> "${newText}"`);
-    } catch (error) {
-        console.error(`❌ Failed to store phrase: ${error}`);
-    }
-}
-
 const sha1 = (s: string) => crypto.createHash("sha1").update(s).digest("hex");
 
 function normalizeUrl(raw: string): string {

@@ -121,3 +121,8 @@ export type Source = Prisma.RecipeGetPayload<{
         }
     };
 }>;
+
+export type PhraseVariants = {
+    info: string;
+    text: string;
+}[]

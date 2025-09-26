@@ -238,12 +238,18 @@ model RecipeMeta {
 
 model Phrase {
   id        BigInt   @id @default(autoincrement())
-  hash      String   @unique @db.VarChar(64)
+  sourceId  Int      @map("source_id")
+  hash      String   @default("") @db.VarChar(64)
+  type      String   @default("default") @db.VarChar(32)
+  version   String   @default("default") @db.VarChar(32)
   text      String   @db.LongText
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([hash])
+  source Source? @relation(fields: [sourceId], references: [id])
+
+  @@unique([sourceId, hash])
+  @@unique([type, sourceId, version])
   @@map("phrases")
 }
 
@@ -262,6 +268,7 @@ model Source {
   recipeUrlImage RecipeUrlImage[]
   SourceImage    SourceImage[]
   recipe         Recipe?          @relation(fields: [recipeId], references: [id], map: "recipe_urls_recipe_id_fkey")
+  Phrase         Phrase[]
 
   @@map("sources")
 }
