@@ -1,9 +1,7 @@
-// process.ts
 import { iterate, prisma } from "../../lib/iterator";
-import { RecipeUrl } from "./types";
 import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
-
-type Paragraph = { text?: string; [k: string]: any };
+import {Source} from "@prisma/client";
+import {RecipeJson} from "../../types";
 
 const claude = new ClaudeBatchProvider();
 
@@ -26,7 +24,6 @@ Text to rewrite:
 ${text}`;
 }
 
-
 export async function process() {
     await iterate(prisma.source)
         .select({
@@ -42,13 +39,13 @@ export async function process() {
         .startPosition(1)
         .perPage(50)
         .entityName("recipes")
-        .forEachAsync(async (recipe: RecipeUrl) => {
+        .forEachAsync(async (source: Source) => {
             try {
-                const parsed = recipe.json ? JSON.parse(recipe.json) : null;
-                const paragraphs: Paragraph[] | undefined = parsed?.paragraphs;
+                const parsed = source.json as RecipeJson;
+                const paragraphs = parsed?.paragraphs;
 
                 if (!Array.isArray(paragraphs) || paragraphs.length === 0) {
-                    console.log(`Recipe ${recipe.id}: No paragraphs, skipping`);
+                    console.log(`Recipe ${source.id}: No paragraphs, skipping`);
                     return;
                 }
 
@@ -57,7 +54,7 @@ export async function process() {
                     .filter((x): x is { id: string; text: string } => x !== null);
 
                 if (work.length === 0) {
-                    console.log(`Recipe ${recipe.id}: No paragraph.text strings, skipping`);
+                    console.log(`Recipe ${source.id}: No paragraph.text strings, skipping`);
                     return;
                 }
 
@@ -71,16 +68,16 @@ export async function process() {
                 const batchId = await claude.submitBatch(requests);
 
                 await prisma.source.update({
-                    where: { id: recipe.id },
+                    where: { id: source.id },
                     data: { batchId },
                 });
 
-                console.log(`Recipe ${recipe.id}: submitted batch ${batchId} and saved to DB`);
+                console.log(`Recipe ${source.id}: submitted batch ${batchId} and saved to DB`);
 
 
                 // no status polling / no results fetching here
             } catch (err: any) {
-                console.error(`Error processing recipe ${recipe.id}:`, err?.message ?? err);
+                console.error(`Error processing recipe ${source.id}:`, err?.message ?? err);
             }
         });
 
