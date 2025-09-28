@@ -1,7 +1,7 @@
 // process.ts
 import { iterate, prisma } from "../../lib/iterator";
-import { RecipeUrl } from "./types";
 import { RecipeJson } from "../../types";
+import {Source} from "@prisma/client";
 
 
 export async function processRecipes() {
@@ -23,7 +23,7 @@ export async function processRecipes() {
         .startPosition(1)
         .perPage(50)
         .entityName("recipes")
-        .forEachAsync(async (recipe: RecipeUrl) => {
+        .forEachAsync(async (recipe: Source) => {
             const json = recipe.json as RecipeJson;
             const images = json?.images;
             if (!images?.length) {

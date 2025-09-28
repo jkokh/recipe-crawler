@@ -198,19 +198,6 @@ model NutritionTranslation {
   @@map("nutrition_translation")
 }
 
-model RecipeUrlImage {
-  id       Int     @id @default(autoincrement())
-  recipeId Int     @map("recipe_url_id")
-  imageUrl String  @map("image_url") @db.Text
-  altText  String? @map("alt_text") @db.VarChar(1024)
-  valid    Boolean @default(true) @map("valid")
-  type     String? @map("type")
-  sources  Source  @relation(fields: [recipeId], references: [id], map: "recipe_images_recipe_url_id_fkey")
-
-  @@index([recipeId], map: "idx_recipe_images_recipe_url_id")
-  @@map("recipe_url_images")
-}
-
 model RecipeCategory {
   recipeId   Int
   categoryId Int
@@ -239,36 +226,32 @@ model RecipeMeta {
 model Phrase {
   id        BigInt   @id @default(autoincrement())
   sourceId  Int      @map("source_id")
-  hash      String   @default("") @db.VarChar(64)
   type      String   @default("default") @db.VarChar(32)
-  version   String   @default("default") @db.VarChar(32)
   text      String   @db.LongText
+  version   String   @default("default") @db.VarChar(32)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  hash      String   @default("") @db.VarChar(64)
 
-  source Source? @relation(fields: [sourceId], references: [id])
-
-  @@unique([sourceId, hash])
+  @@unique([sourceId, hash, version])
   @@unique([type, sourceId, version])
   @@map("phrases")
 }
 
 model Source {
-  id             Int              @id @default(autoincrement()) @map("id")
-  recipeUrl      String           @map("recipe_url")
-  recipeDate     DateTime?        @map("recipe_date")
-  htmlContent    String?          @map("html_content") @db.LongText
-  recipeId       Int?             @unique(map: "recipe_urls_recipe_id_key") @map("recipe_id")
-  batchId        Json?            @map("batch_id")
-  jsonParsed     Json?            @map("json_parsed")
-  json           Json?            @map("json")
-  jsonHistory    Json?            @map("json_history")
-  createdAt      DateTime         @default(now()) @map("created_at")
-  updatedAt      DateTime         @default(now()) @updatedAt @map("updated_at")
-  recipeUrlImage RecipeUrlImage[]
-  SourceImage    SourceImage[]
-  recipe         Recipe?          @relation(fields: [recipeId], references: [id], map: "recipe_urls_recipe_id_fkey")
-  Phrase         Phrase[]
+  id           Int           @id @default(autoincrement()) @map("id")
+  recipeUrl    String        @map("recipe_url")
+  recipeDate   DateTime?     @map("recipe_date")
+  htmlContent  String?       @map("html_content") @db.LongText
+  recipeId     Int?          @unique(map: "recipe_urls_recipe_id_key") @map("recipe_id")
+  batchId      Json?         @map("batch_id")
+  json         Json?         @map("json")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
+  jsonHistory  Json?         @map("json_history")
+  jsonParsed   Json?         @map("json_parsed")
+  sourceImages SourceImage[]
+  recipe       Recipe?       @relation(fields: [recipeId], references: [id], map: "recipe_urls_recipe_id_fkey")
 
   @@map("sources")
 }
@@ -284,8 +267,7 @@ model SourceImage {
   downloaded Boolean  @default(false)
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
-
-  source Source? @relation(fields: [sourceId], references: [id])
+  source     Source?  @relation(fields: [sourceId], references: [id])
 
   @@unique([sourceId, stableId])
   @@index([sourceId])

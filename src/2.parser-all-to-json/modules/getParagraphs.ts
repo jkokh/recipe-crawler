@@ -78,7 +78,7 @@ export const getParagraphs = ($article: cheerio.Cheerio, source: Source): Paragr
                 paragraph.list = list;
             }
         }
-        const images = getImageIds(getSimplyDataSrc($(element)), source);
+        const images = getImageIds($(element), source);
 
         if (images.length > 0) {
             paragraph.images = images;

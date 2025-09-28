@@ -2,45 +2,50 @@ import { prisma } from "./iterator";
 import { cryptoHash } from "../2.parser-all-to-json/modules/parserUtils";
 
 type StoreInput = {
-    phrase: string;
+    originalText: string;
+    alteredText: string;
     sourceId: number;
     type: string;
     version: string;
 };
 
-type PhraseEntry = {
+export interface PhraseEntry {
     sourceId: number;
     type: string;
     version: string;
     text: string;
     hash: string;
-};
+}
 
 export class PhraseService {
     async store(input: StoreInput): Promise<void> {
-        const hash = cryptoHash(input.phrase);
-
-        await prisma.phrase.upsert({
-            where: {
-                type_sourceId_version: {
-                    type: input.type,
-                    sourceId: input.sourceId,
-                    version: input.version
+        const { originalText, alteredText, sourceId, type, version } = input;
+        const hash = cryptoHash(originalText);
+        try {
+            await prisma.phrase.upsert({
+                where: {
+                    type_sourceId_version: {
+                        type,
+                        version,
+                        sourceId
+                    }
+                },
+                update: {
+                    text: alteredText,
+                    hash,
+                    updatedAt: new Date()
+                },
+                create: {
+                    text: alteredText,
+                    hash,
+                    sourceId,
+                    type,
+                    version
                 }
-            },
-            update: {
-                text: input.phrase,
-                hash,
-                updatedAt: new Date()
-            },
-            create: {
-                text: input.phrase,
-                hash,
-                sourceId: input.sourceId,
-                type: input.type,
-                version: input.version
-            }
-        });
+            });
+        } catch (e) {
+            console.error(`Error storing phrase: ${type} ${version} ${sourceId}`, e);
+        }
     }
 
     async getAll(sourceId: number): Promise<PhraseEntry[]> {

@@ -12,18 +12,6 @@ import {parseImages} from "./modules/getImages";
 import {saveImages} from "./modules/saveImages";
 
 
-/*const gpt = new GPTProvider({
-    returnJsonStructure: { header: "string", text: "string" }
-});
-
-function makePrompt(title: string): string {
-    return `Rewrite this recipe image alt text: ${title}
-    
-Do not include anything except the rewritten alt text.
-Keep it concise and natural.
-No comments or explanations. Return a rewritten string!`;
-}*/
-
 export async function process() {
     await iterate(prisma.source)
         .select({
@@ -31,7 +19,7 @@ export async function process() {
             recipeUrl: true,
             json: true,
             htmlContent: true,
-            recipeUrlImage: true
+            sourceImages: true
         })
         .where({
 
@@ -53,23 +41,6 @@ export async function process() {
             const nutrition = getNutrition($article, source);
             const steps = getSteps($article, source);
             const paragraphs = getParagraphs($article, source);
-
-            /*images = await Promise.all(images.map(async (img) => {
-                if (!img.alt) return img;
-                const phrase = await getRewrittenPhrase(img.alt);
-                if (phrase) {
-                    img.alt = phrase;
-                } else {
-                    try {
-                        const phrase = await gpt.ask<string>(makePrompt(img.alt));
-                        await storePhrase(img.alt, phrase);
-                        img.alt = phrase ?? img.alt;
-                    } catch (e) {
-                        console.error('Error processing image:', img.alt, e);
-                    }
-                }
-                return img;
-            }));*/
             const jsonParsed: RecipeJson = {
                 title,
                 ingredients: ingredients.data,

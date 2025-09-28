@@ -38,27 +38,16 @@ export const getSteps = ($article: cheerio.Cheerio, source: Source): StepsResult
             }
         });
 
-        const images: string[] = [];
-        $step.find('img').each((_, img) => {
-            const src = $(img).attr('src');
-            if (src) {
-                images.push(src);
-            } else {
-                const dataSrc = $(img).attr('data-src');
-                if (dataSrc) {
-                    images.push(dataSrc);
-                }
-            }
-        });
-
         if (hasLinks($steps)) {
             needsReview = true;
         }
 
+        const images = getImageIds($step, source);
+
         data.push({
             title,
             instructions: instructions.trim(),
-            images: getImageIds(images, source)
+            images
         });
     });
     $steps.remove();

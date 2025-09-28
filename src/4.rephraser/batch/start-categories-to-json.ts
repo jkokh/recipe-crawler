@@ -10,9 +10,6 @@ export async function process() {
             recipeUrl: true,
             categories: true
         })
-        .where({
-
-        })
         .startPosition(1)
         .perPage(50)
         .entityName("recipes")

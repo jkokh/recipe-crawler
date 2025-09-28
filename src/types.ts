@@ -1,4 +1,4 @@
-import {Ingredient, Nutrition, Paragraph, RecipeMeta, Step} from "./2.parser-all-to-json/types";
+import {Ingredient, Nutrition, RecipeMeta, Step} from "./2.parser-all-to-json/types";
 
 export type RecipeJson = {
     title: string;
@@ -10,11 +10,6 @@ export type RecipeJson = {
     categories: number[];
     tags?: string[];
     images: ImagesParsed[] | null;
-}
-
-export type Batch = {
-    id: string;
-    name: string;
 }
 
 import { Prisma } from "@prisma/client";
@@ -122,7 +117,26 @@ export type Source = Prisma.RecipeGetPayload<{
     };
 }>;
 
-export type PhraseVariants = {
-    info: string;
+export interface TextParagraph {
     text: string;
-}[]
+}
+
+export interface HeaderParagraph {
+    header: string;
+}
+
+export interface ListParagraph {
+    list: string[];
+}
+
+export interface ImagesParagraph {
+    images: number[];
+}
+
+export type Paragraph = {
+    header?: string;
+    text?: string;
+    list?: string[];
+    images?: number[];
+}
+

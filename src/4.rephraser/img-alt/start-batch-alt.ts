@@ -1,8 +1,8 @@
 import { iterate, prisma } from "../../lib/iterator";
-import { RecipeUrl } from "./types";
 import { RecipeJson } from "../../types";
 import { appendFileSync } from "fs";
 import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
+import {Source} from "@prisma/client";
 
 const claude = new ClaudeBatchProvider();
 
@@ -26,7 +26,7 @@ export async function processRecipes() {
             id: true,
             recipeId: true,
             recipeUrl: true,
-            json: true,
+            jsonParsed: true,
         })
         .where({
         })
@@ -34,13 +34,13 @@ export async function processRecipes() {
         .startPosition(1)
         .perPage(50)
         .entityName("recipes")
-        .getPageResults(async (recipes: RecipeUrl[]) => {
+        .getPageResults(async (source: Source[]) => {
             try {
                 const requests: { customId: string; prompt: string }[] = [];
-                recipes.forEach((recipe) => {
-                    const json = recipe.json as RecipeJson;
+                source.forEach((source) => {
+                    const json = source.jsonParsed as RecipeJson;
                     json.images!.forEach((img, index) => {
-                        const customId = recipe.id.toString() + '_' + index;
+                        const customId = source.id.toString() + '_' + index;
                         requests.push({
                             customId, prompt: makePrompt(img.alt)
                         });

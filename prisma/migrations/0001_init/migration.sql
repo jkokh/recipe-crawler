@@ -215,13 +215,16 @@ CREATE TABLE `recipe_meta` (
 -- CreateTable
 CREATE TABLE `phrases` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
-    `hash` VARCHAR(64) NOT NULL,
+    `source_id` INTEGER NOT NULL,
+    `type` VARCHAR(32) NOT NULL DEFAULT 'default',
     `text` LONGTEXT NOT NULL,
+    `version` VARCHAR(32) NOT NULL DEFAULT 'default',
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
+    `hash` VARCHAR(64) NOT NULL DEFAULT '',
 
-    UNIQUE INDEX `phrases_hash_key`(`hash`),
-    INDEX `phrases_hash_idx`(`hash`),
+    UNIQUE INDEX `phrases_source_id_hash_version_key`(`source_id`, `hash`, `version`),
+    UNIQUE INDEX `phrases_type_source_id_version_key`(`type`, `source_id`, `version`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -236,6 +239,8 @@ CREATE TABLE `sources` (
     `json` JSON NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `json_history` JSON NULL,
+    `json_parsed` JSON NULL,
 
     UNIQUE INDEX `recipe_urls_recipe_id_key`(`recipe_id`),
     PRIMARY KEY (`id`)

@@ -1,7 +1,6 @@
-import {Recipe} from "../../types";
 import crypto from 'crypto';
-import {prisma} from "../../lib/iterator";
 import {Source} from "@prisma/client";
+import {stableIdFromUrl} from "./getImages";
 
 export function getSimplyDataSrc(el: cheerio.Cheerio): string[] {
     const urls: string[] = [];
@@ -20,18 +19,20 @@ export function getSimplyDataSrc(el: cheerio.Cheerio): string[] {
     return urls;
 }
 
-export function getImageIds(imageUrls: string[], source: Source): number[] {
-    const src = (source as any).recipeUrlImage ?? [];
+export function getImageIds(element: cheerio.Cheerio, source: Source): number[] {
+    const imageUrls = getSimplyDataSrc(element)
+    const src = (source as any).sourceImages ?? [];
     if (!imageUrls?.length || !src.length) return [];
-    const urlToId = new Map<string, number>();
-    for (const img of src) if (img?.imageUrl && typeof img.id === 'number') urlToId.set(img.imageUrl, img.id);
-    const out: number[] = [];
-    const seen = new Set<number>();
-    for (const url of imageUrls) {
-        const id = urlToId.get(url);
-        if (id != null && !seen.has(id)) { out.push(id); seen.add(id); }
-    }
-    return out;
+
+    const stableIdToId = new Map(
+        src.filter((img: any) => img?.stableId && typeof img.id === 'number')
+            .map((img: any) => [img.stableId, img.id] as [string, number])
+    );
+
+    return [...new Set(
+        imageUrls.map(url => stableIdToId.get(stableIdFromUrl(url)))
+            .filter((id): id is number => id != null)
+    )];
 }
 
 export function hasLinks(el: cheerio.Cheerio): boolean {
@@ -40,16 +41,4 @@ export function hasLinks(el: cheerio.Cheerio): boolean {
 
 export function cryptoHash(str: string, algorithm: 'md5' | 'sha1' | 'sha256' = 'sha256'): string {
     return crypto.createHash(algorithm).update(str).digest('hex');
-}
-
-const sha1 = (s: string) => crypto.createHash("sha1").update(s).digest("hex");
-
-function normalizeUrl(raw: string): string {
-    const u = new URL(raw);
-    u.hash = "";
-    return u.toString();
-}
-
-function getStableId(url: string): string {
-    return sha1(normalizeUrl(url));
 }

@@ -56,7 +56,8 @@ export async function process() {
                 if (!rewritten) continue;
 
                 await phraseService.store({
-                    phrase: rewritten,
+                    originalText: seed,
+                    alteredText: rewritten,
                     sourceId: r.sourceId,
                     type: "title",
                     version: "gpt v1"
