@@ -102,7 +102,6 @@ model Recipe {
   steps        RecipeStep[]
   tags         RecipeTagLink[]
   translations RecipeTranslation[]
-  sources      Source?
 
   @@map("recipe")
 }
@@ -243,15 +242,11 @@ model Source {
   recipeUrl    String        @map("recipe_url")
   recipeDate   DateTime?     @map("recipe_date")
   htmlContent  String?       @map("html_content") @db.LongText
-  recipeId     Int?          @unique(map: "recipe_urls_recipe_id_key") @map("recipe_id")
-  batchId      Json?         @map("batch_id")
-  json         Json?         @map("json")
+  jsonAltered  Json?         @map("json_altered")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
-  jsonHistory  Json?         @map("json_history")
   jsonParsed   Json?         @map("json_parsed")
   sourceImages SourceImage[]
-  recipe       Recipe?       @relation(fields: [recipeId], references: [id], map: "recipe_urls_recipe_id_fkey")
 
   @@map("sources")
 }

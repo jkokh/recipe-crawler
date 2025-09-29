@@ -3,27 +3,34 @@ import {RecipeJson} from "../types";
 import {validate} from "./validate";
 import {GPTProvider} from "../lib/ai-providers/gpt";
 import {pipeline} from "../lib/ai-pipeline/pipeline";
+import {convertToJson} from "./convertToJson";
 
 
-export async function querier(recipeJson: RecipeJson, categories: string): Promise<{ categories: number[] }> {
+export async function querier(recipeJson: RecipeJson, categories: string): Promise<number[]> {
     const gpt = new GPTProvider({
         returnJsonStructure: { categories: "number[]" }
     });
 
     delete recipeJson.meta;
     delete recipeJson.nutrition;
+    delete recipeJson.images;
+    delete recipeJson.categories;
 
     const prmpt = prompts[0].replace('<%data%>', JSON.stringify(recipeJson)).replace('<%categories%>', categories);
 
     const result = await pipeline<string>()
         .step(
             () => gpt.ask<string>(prmpt),
+            convertToJson,
             validate
         )
         .execute();
 
     if (!result.success || !result.data) {
         throw new Error(`Query failed: ${result.error || 'Unknown error'}`);
+    }
+    if (result.data.length === 0) {
+        console.log("No categories found");
     }
 
     return result.data as any;

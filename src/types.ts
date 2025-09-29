@@ -7,9 +7,9 @@ export type RecipeJson = {
     paragraphs: Paragraph[] | null;
     steps: Step[] | null;
     meta?: RecipeMeta | null;
-    categories: number[];
+    categories?: number[];
     tags?: string[];
-    images: ImagesParsed[] | null;
+    images?: ImagesParsed[] | null;
 }
 
 import { Prisma } from "@prisma/client";

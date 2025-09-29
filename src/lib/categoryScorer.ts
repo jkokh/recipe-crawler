@@ -1,6 +1,9 @@
 // src/lib/categoryScorer.ts
 // Calculate category scores for a recipe using JSON keywords on each category.
 
+import {Source} from "@prisma/client";
+import {RecipeJson} from "../types";
+
 export type CategoryKeywords = { positives?: string[]; negatives?: string[] };
 
 export type CategoryRow = {
@@ -11,32 +14,6 @@ export type CategoryRow = {
     keywords: CategoryKeywords | null;
 };
 
-export type MinimalStep = {
-    title: string;
-    text: string;
-    titleAlt?: string | null;
-    textAlt?: string | null;
-};
-
-export type MinimalIngredient = { text: string };
-
-export type MinimalRecipe = {
-    id: number;
-    title?: string | null;
-    description?: string | null;
-    steps?: MinimalStep[];
-    ingredients?: MinimalIngredient[];
-    recipeUrl?: {
-        jsonAltered?: {
-            paragraphs: {
-                header?: string;
-                text?: string;
-                list?: string[];
-            }[];
-        }
-
-    };
-};
 
 // ---------- config (tunable) ----------
 const NEG_WEIGHT = 0.8; // penalty per negative hit
@@ -138,16 +115,17 @@ function boundaryCountAllSingular(textSingular: string, phrases: string[]): numb
 
 // NEW: field-aware scorer (title > ingredients > body) with plural/singular + count-all
 function relevanceStrictWeighted(
-    recipe: MinimalRecipe,
+    source: Source,
     bag: CategoryKeywords | null | undefined
 ) {
-    const titleRaw = basicNormalize(recipe.title ?? "");
+    const jsonParsed = source.jsonParsed as RecipeJson;
+    const titleRaw = basicNormalize(jsonParsed.title ?? "");
     const bodyRaw = basicNormalize(
         [
-            ...(recipe.steps ?? []).map(
-                s => `${s.title ?? ""} ${s.text ?? ""} ${s.titleAlt ?? ""} ${s.textAlt ?? ""}`
+            ...(jsonParsed.steps ?? []).map(
+                s => `${s.title ?? ""} ${s.instructions ?? ""}`
             ),
-            ...(recipe.recipeUrl!.jsonAltered?.paragraphs ?? []).map(p => {
+            ...(jsonParsed.paragraphs ?? []).map(p => {
                 if (p.text) return p.text;
                 if (p.header) return p.header;
                 if (Array.isArray(p.list)) return p.list.join(" ");
@@ -156,7 +134,7 @@ function relevanceStrictWeighted(
         ].join(" ")
     );
 
-    const ingredRaw = basicNormalize((recipe.ingredients ?? []).map(i => i.text).join(" "));
+    const ingredRaw = basicNormalize((jsonParsed.ingredients ?? []).map(i => i.name).join(" "));
 
     // Singularized variants for recall
     const titleSing  = singularizeText(titleRaw);
@@ -213,14 +191,14 @@ export type CategoryScores = {
  * Pass in: the recipe (any fields you have) and the categories with keywords.
  */
 export function scoreRecipeCategories(
-    recipe: MinimalRecipe,
+    source: Source,
     categories: CategoryRow[]
 ): CategoryScores {
     const scores: Record<number, number> = {};
     const details: CategoryScores["details"] = {};
 
     for (const c of categories) {
-        const { raw, rel } = relevanceStrictWeighted(recipe, c.keywords);
+        const { raw, rel } = relevanceStrictWeighted(source, c.keywords);
         scores[c.id] = rel;
         details[c.id] = { raw, relevance: rel, title: c.title, slug: c.slug };
     }
