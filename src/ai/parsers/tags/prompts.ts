@@ -15,7 +15,7 @@ RULES:
 - If nothing applies, return []
 
 EXAMPLES OUTPUT:
-["Italian","Pasta","Chicken","Creamy","30-Minute","Dinner"]
+["Italian","Pasta","Chicken","Creamy","Dinner"]
 ["Mexican","Tacos","Lentil","Vegan","Weeknight","Dinner"]
 
 INPUT:

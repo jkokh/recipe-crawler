@@ -20,7 +20,7 @@ async function saveUrlsToDb(urls: { loc: string, lastmod?: string }[]) {
     // Only keep URLs matching /recipe-{number}
     const recipeUrls = urls.filter(({ loc }) => RECIPE_URL_REGEX.test(loc));
     for (const { loc, lastmod } of recipeUrls) {
-        await prisma.recipeUrl.upsert({
+        await prisma.source.upsert({
             where: { recipeUrl: loc },
             update: { recipeDate: lastmod ? new Date(lastmod) : null },
             create: { recipeUrl: loc, recipeDate: lastmod ? new Date(lastmod) : null }

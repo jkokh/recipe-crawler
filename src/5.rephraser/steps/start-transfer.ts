@@ -32,7 +32,7 @@ export async function process() {
                     // Update database
                     await prisma.source.updateMany({
                         where: { recipeId: recipe.id },
-                        data: { json: json as Prisma.InputJsonValue }
+                        data: { jsonParsed: json as Prisma.InputJsonValue }
                     });
                 }
             }

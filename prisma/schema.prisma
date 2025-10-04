@@ -242,10 +242,10 @@ model Source {
   recipeUrl    String        @map("recipe_url")
   recipeDate   DateTime?     @map("recipe_date")
   htmlContent  String?       @map("html_content") @db.LongText
+  jsonParsed   Json?         @map("json_parsed")
   jsonAltered  Json?         @map("json_altered")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
-  jsonParsed   Json?         @map("json_parsed")
   sourceImages SourceImage[]
 
   @@map("sources")

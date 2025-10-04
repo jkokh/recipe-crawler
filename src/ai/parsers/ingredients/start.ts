@@ -1,12 +1,10 @@
-import {Ingredient, parseIngredients} from "./parser";
+import {Ingredient} from "./parser";
 import {ensureIngredientId, normalizeIngredientName} from "./ensureIngredient";
-import {extractIngredientTextsFromArticle} from "./extract";
 import {findIngredientId, LoadedIng, preloadIngredients} from "./ingredientMatch";
-import {aiPipeline} from "./ai-pipeline";
 import {iterate, prisma} from "../../../lib/iterator";
-import {Recipe} from "../../../types";
+import {Source} from "@prisma/client";
+import {RecipeJson} from "../../../types";
 
-type Source =  'DOM' | 'TEXT' | 'GPT' | 'OLLAMA';
 
 type Row = {
     recipeId: number;
@@ -31,39 +29,29 @@ export async function process() {
 
     const preloadedIngredients: LoadedIng[] = await preloadIngredients();
 
-    await iterate(prisma.recipe)
+    await iterate(prisma.source)
         .select({
             id: true,
-            title: true,
-            description: true,
-            ingredients: true,
-            recipeUrl: {
-                select: {
-                    htmlContent: true,
-                    htmlClean: true,
-                    json: true
-                }
-            }
-
+            jsonParsed: true
         })
         .startPosition(1)
         .perPage(50)
         .entityName('recipes')
-        .forEachAsync(async (recipe: Recipe) => {
-            if (recipe.ingredients.length) {
+        .forEachAsync(async (source: Source) => {
+
+            const jsonParsed = source.jsonParsed as RecipeJson;
+            if (!jsonParsed.ingredients?.length) {
                 return;
             }
             const rows: Row[] = [];
 
-            const html = recipe.sources?.htmlContent ?? "";
-            const jsonObj = (() => { try { return recipe.sources!.json ?? null; } catch { return null; } })();
 
             const norm255 = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 255);
 
             const pushUnique = (ingredientId: bigint | null, text: string, source: Source) => {
                 const t = norm255(text);
                 if (!t) return;
-                rows.push({ recipeId: recipe.id, ingredientId: Number(ingredientId), text: t, source });
+                rows.push({ recipeId: source.id, ingredientId: Number(ingredientId), text: t, source });
             };
 
             const addFromParsed = async (ings: Ingredient[], source: Source) => {
@@ -80,33 +68,22 @@ export async function process() {
                 }
             };
 
-            // --- Stage 1: HTML ---
-            if (html) {
-                await addFromParsed(parseIngredients(html), 'DOM');
-            }
 
             // --- Stage 2: JSON block fallback ---
-            if (!rows.length && jsonObj) {
-                const lines = extractIngredientTextsFromArticle(jsonObj);
-                addFromLines(lines, 'TEXT');
-            }
+            // const lines = extractIngredientTextsFromArticle(jsonObj);
 
             // --- Stage 3: AI fallback ---
-            if (!rows.length && jsonObj) {
-                const lines = await aiPipeline(recipe.recipeUrl!.htmlClean);
-                addFromLines(lines, 'GPT');
-            }
 
             // --- Insert & counters ---
-            if (rows.length) {
+            /*if (rows.length) {
                 await prisma.recipeIngredient.deleteMany({
-                    where: { recipeId: recipe.id }
+                    where: { recipeId: source.id }
                 });
                 await prisma.recipeIngredient.createMany({ data: rows });
                 totalParsed++;
             } else {
                 totalMissing++;
-            }
+            }*/
         });
 
 

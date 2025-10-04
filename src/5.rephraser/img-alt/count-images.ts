@@ -24,7 +24,7 @@ export async function processRecipes() {
         .perPage(50)
         .entityName("recipes")
         .forEachAsync(async (recipe: Source) => {
-            const json = recipe.json as RecipeJson;
+            const json = recipe.jsonParsed as RecipeJson;
             const images = json?.images;
             if (!images?.length) {
                 console.log(`NO IMAGES!!!!`);

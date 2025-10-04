@@ -38,10 +38,9 @@ export async function process() {
         .orderBy({ id: 'asc' })
         .startPosition(1)
         .perPage(50)
-        .entityName("recipes")
         .forEachAsync(async (source: Source) => {
             try {
-                const parsed = source.json as RecipeJson;
+                const parsed = source.jsonParsed as RecipeJson;
                 const paragraphs = parsed?.paragraphs;
 
                 if (!Array.isArray(paragraphs) || paragraphs.length === 0) {
@@ -67,10 +66,11 @@ export async function process() {
                 // submit a batch per recipe
                 const batchId = await claude.submitBatch(requests);
 
-                await prisma.source.update({
+                // save the batch ID to a file
+                /*await prisma.source.update({
                     where: { id: source.id },
                     data: { batchId },
-                });
+                });*/
 
                 console.log(`Recipe ${source.id}: submitted batch ${batchId} and saved to DB`);
 
