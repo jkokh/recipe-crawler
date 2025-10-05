@@ -7,7 +7,7 @@ export const sitemapsConfig: SitemapConfig[] = [
     {
         title: "simplyrecipes",
         files: [
-            "./src/sitemap-parser/sitemaps/simplyrecipes/sitemap_1.xml"
+            "./sitemaps/simplyrecipes/sitemap_1.xml"
         ]
     }
 ];

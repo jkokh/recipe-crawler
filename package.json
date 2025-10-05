@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "linkCrawler": "node --import ./register-loader.js src/crawler/crawler.ts",
-    "sitemapLinks": "node --import ./register-loader.js src/0.sitemap-parser/sitemapParser.ts",
+    "sitemapLinks": "node --import ./register-loader.js src/0.sitemap-parser/run-sitemap-parser.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy"

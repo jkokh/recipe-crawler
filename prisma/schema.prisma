@@ -58,7 +58,7 @@ model Phrase {
 
 model Source {
   id           Int           @id @default(autoincrement()) @map("id")
-  recipeUrl    String        @map("recipe_url")
+  recipeUrl    String        @unique @map("recipe_url")
   recipeDate   DateTime?     @map("recipe_date")
   htmlContent  String?       @map("html_content") @db.LongText
   jsonParsed   Json?         @map("json_parsed")
