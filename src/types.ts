@@ -8,7 +8,7 @@ export type RecipeJson = {
     steps: Step[] | null;
     meta?: RecipeMeta | null;
     categories?: number[];
-    tags?: string[];
+    tags?: number[];
     images?: ImagesParsed[] | null;
 }
 
