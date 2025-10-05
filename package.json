@@ -8,8 +8,7 @@
     "sitemapLinks": "node --import ./register-loader.js src/0.sitemap-parser/sitemapParser.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:deploy": "prisma migrate deploy",
-    "tags:run": "node --import ./register-loader.js src/7.tags/run-tags.ts"
+    "prisma:migrate:deploy": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
