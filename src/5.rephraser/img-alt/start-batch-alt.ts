@@ -39,8 +39,9 @@ export async function processRecipes() {
                 const requests: { customId: string; prompt: string }[] = [];
                 source.forEach((source) => {
                     const json = source.jsonParsed as RecipeJson;
-                    json.images!.forEach((img, index) => {
-                        const customId = source.id.toString() + '_' + index;
+                    json.images!.forEach((img) => {
+                        if (!img.alt) return;
+                        const customId = source.id.toString() + '_' + img.stableId;
                         requests.push({
                             customId, prompt: makePrompt(img.alt)
                         });

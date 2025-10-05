@@ -1,26 +1,20 @@
 import * as cheerio from "cheerio";
 import {Step} from "../types";
-import {Source, SourceImage} from "@prisma/client";
-import {getImageIds, hasLinks} from "./parserUtils";
+import {SourceImage} from "@prisma/client";
+import {getImageIds} from "./parserUtils";
 
 
-interface StepsResult {
-    data: Step[] | null;
-    needsReview: boolean;
-}
-
-export const getSteps = ($article: cheerio.Cheerio, sourceImages: SourceImage[]): StepsResult  => {
+export const getSteps = ($article: cheerio.Cheerio, sourceImages: SourceImage[]): Step[] | null  => {
 
     const $ = cheerio.load($article[0]);
 
     const $steps = $('.structured-project__steps');
 
     if (!$steps.length) {
-        return { data: null, needsReview: false };
+        return null;
     }
 
     const data: Step[] = [];
-    let needsReview = false;
 
     $steps.find('ol > li').each((_, stepElement) => {
         const $step = $(stepElement);
@@ -38,10 +32,6 @@ export const getSteps = ($article: cheerio.Cheerio, sourceImages: SourceImage[])
             }
         });
 
-        if (hasLinks($steps)) {
-            needsReview = true;
-        }
-
         const images = getImageIds($step, sourceImages);
 
         data.push({
@@ -51,13 +41,13 @@ export const getSteps = ($article: cheerio.Cheerio, sourceImages: SourceImage[])
         });
     });
     $steps.remove();
-    return { data: data.length ? data : null, needsReview };
+    return data.length ? data : null;
 }
 
 function removeAttribution(text: string): string {
-    // Remove "Simply Recipes / Name" pattern
+    // Remove the "Simply Recipes / Name" pattern
     return text
-        .replace(/Simply Recipes\s*\/\s*[^,\.]+/g, '')
+        .replace(/Simply Recipes\s*\/\s*[^,.]+/g, '')
         .replace(/\(Simply Recipes\)/g, '')
         .replace(/Simply Recipes/g, '')
         // Clean up any double spaces that might result from removals

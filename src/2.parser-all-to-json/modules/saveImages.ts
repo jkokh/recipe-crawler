@@ -1,17 +1,17 @@
 import { ImagesParsed } from "../../types";
-import { PrismaClient, Source } from "@prisma/client";
+import {PrismaClient, SourceImage} from "@prisma/client";
 
 
 export async function saveImages(
     imagesParsed: ImagesParsed[],
     sourceId: number,
     prisma: PrismaClient
-): Promise<ImagesParsed[]> {
-    const out: ImagesParsed[] = [];
+): Promise<SourceImage[]> {
+    const out: SourceImage[] = [];
 
     for (let index = 0; index < imagesParsed.length; index++) {
         const img = imagesParsed[index];
-        const stableId = img.stableId; // assume already computed
+        const stableId = img.stableId;
 
         try {
             if (img.id != null) {
@@ -22,10 +22,9 @@ export async function saveImages(
                         alt: img.alt,
                         isLead: img.lead,
                         order: index,
-                    },
-                    select: { id: true },
+                    }
                 });
-                out.push({ ...img, id: row.id });
+                out.push(row);
             } else {
                 // Insert-or-update by (sourceId, stableId)
                 const row = await prisma.sourceImage.upsert({
@@ -43,15 +42,12 @@ export async function saveImages(
                         alt: img.alt,
                         isLead: img.lead,
                         order: index,
-                    },
-                    select: { id: true },
+                    }
                 });
-                out.push({ ...img, id: row.id });
+                out.push(row);
             }
         } catch (e) {
-            // If you want to see why an item failed, log minimal context:
             console.error(`saveImages: failed sourceId=${sourceId} stableId=${stableId} id=${img.id ?? "∅"}`, e);
-            out.push({ ...img, id: img.id }); // keep original id (possibly undefined)
         }
     }
 

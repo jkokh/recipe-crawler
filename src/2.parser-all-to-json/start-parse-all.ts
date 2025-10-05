@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Prisma, PrismaClient, Source } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { getTitle } from "./modules/getTitle";
 import { getIngredients } from "./modules/getIngredients";
 import { getNutrition } from "./modules/getNutrition";
@@ -45,9 +45,6 @@ function pickFields<T extends object>(
     return result;
 }
 
-/**
- * Main processor
- */
 export async function process(config: ParseConfig = DEFAULT_CONFIG) {
     const finalConfig = { ...DEFAULT_CONFIG, ...config };
 
@@ -65,13 +62,10 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
         } as Prisma.SourceWhereInput)
         : {};
 
-
-
     const totalCount = await prisma.source.count({ where });
     console.log(`Found ${totalCount} sources to process.`);
 
     while (true) {
-// ✅ final preferred version
         const sources = await prisma.source.findMany({
             where,
             select: {
@@ -101,22 +95,22 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
 
             try {
                 // Parse and save images
-                let images = parseImages($article);
-                images = await saveImages(images, source.id, prisma);
+                let parsedImages = parseImages($article);
+                const images = await saveImages(parsedImages, source.id, prisma);
 
                 // Parse structured recipe data
                 const meta = getRecipeMeta($article);
                 const title = getTitle($article);
                 const ingredients = getIngredients($article);
                 const nutrition = getNutrition($article);
-                const steps = getSteps($article, source.sourceImages);
-                const paragraphs = getParagraphs($article, source.sourceImages);
+                const steps = getSteps($article, images);
+                const paragraphs = getParagraphs($article, images);
 
                 const newData: RecipeJson = {
                     title,
                     ingredients: ingredients.data,
                     nutrition,
-                    steps: steps.data,
+                    steps,
                     paragraphs,
                     meta,
                     categories: [],

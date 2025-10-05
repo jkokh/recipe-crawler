@@ -1,8 +1,9 @@
 // process.ts
 import { iterate, prisma } from "../../lib/iterator";
-import {RecipeJson, RecipeUrl} from "../../types";
+import {RecipeJson} from "../../types";
 import { appendFileSync } from "fs";
 import {ClaudeBatchProvider} from "../../lib/ai-providers/claude-batch";
+import {Source} from "@prisma/client";
 
 
 const claude = new ClaudeBatchProvider();
@@ -38,7 +39,7 @@ export async function processRecipes() {
         .startPosition(1)
         .perPage(40)
         .entityName("recipes")
-        .getPageResults(async (recipes: RecipeUrl[]) => {
+        .getPageResults(async (recipes: Source[]) => {
             try {
                 const requests = recipes.map((recipe) => {
                     const json = recipe.jsonAltered as RecipeJson;
