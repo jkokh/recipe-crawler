@@ -7,24 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Language {
-  code  String @id @db.VarChar(8)
-  title String @db.VarChar(64)
-
-  @@map("languages")
-}
-
 model Category {
-  id          Int              @id @default(autoincrement())
-  parentId    Int?
-  title       String
-  slug        String
-  createdAt   DateTime         @default(now())
-  description String?          @db.Text
-  keywords    Json?
-  parent      Category?        @relation("CategoryChildren", fields: [parentId], references: [id])
-  children    Category[]       @relation("CategoryChildren")
-  recipes     RecipeCategory[]
+  id        Int        @id @default(autoincrement())
+  parentId  Int?
+  title     String
+  slug      String
+  keywords  Json?
+  parent    Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryChildren")
+  createdAt DateTime   @default(now())
 
   @@unique([parentId, slug])
   @@index([parentId])
@@ -33,87 +24,32 @@ model Category {
 }
 
 model Tag {
-  id        Int             @id @default(autoincrement())
-  name      String          @db.VarChar(255)
-  createdAt DateTime        @default(now()) @map("created_at")
-  slug      String          @unique @map("slug") @db.VarChar(255)
-  recipes   RecipeTagLink[]
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  slug      String   @unique @map("slug") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("tags")
 }
 
-model RecipeTagLink {
-  recipeId Int
-  tagId    Int
-  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([recipeId, tagId])
-  @@index([tagId], map: "recipe_tag_link_tagId_fkey")
-  @@map("recipe_tag_links")
-}
-
 model Ingredient {
-  id                BigInt             @id @default(autoincrement())
-  name              String
-  slug              String             @unique @db.VarChar(255)
-  createdAt         DateTime           @default(now())
-  recipeIngredients RecipeIngredient[]
+  id        BigInt   @id @default(autoincrement())
+  name      String
+  slug      String   @unique @db.VarChar(255)
+  createdAt DateTime @default(now())
 
   @@map("ingredients")
-}
-
-model Recipe {
-  id          Int                @id @default(autoincrement())
-  slug        String             @unique @db.VarChar(255)
-  title       String             @db.VarChar(255)
-  description String?            @db.LongText
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  seo         String?            @db.VarChar(255)
-  categories  RecipeCategory[]
-  ingredients RecipeIngredient[]
-  tags        RecipeTagLink[]
-
-  @@map("recipes")
-}
-
-model RecipeIngredient {
-  id           BigInt      @id @default(autoincrement())
-  recipeId     Int         @map("recipe_id")
-  ingredientId BigInt?     @map("ingredient_id")
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  text         String      @db.VarChar(255)
-  source       source      @default(DOM)
-  ingredient   Ingredient? @relation(fields: [ingredientId], references: [id])
-  recipe       Recipe      @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-
-  @@index([ingredientId], map: "recipe_ingredient_ingredient_id_fkey")
-  @@index([recipeId], map: "recipe_ingredient_recipe_id_fkey")
-  @@map("recipe_ingredients")
-}
-
-model RecipeCategory {
-  recipeId   Int
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-
-  @@id([recipeId, categoryId])
-  @@index([categoryId, recipeId])
-  @@map("recipe_categories")
 }
 
 model Phrase {
   id        BigInt   @id @default(autoincrement())
   sourceId  Int      @map("source_id")
   type      String   @default("default") @db.VarChar(32)
-  text      String   @db.LongText
   version   String   @default("default") @db.VarChar(32)
+  hash      String   @default("") @db.VarChar(64)
+  text      String   @db.LongText
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  hash      String   @default("") @db.VarChar(64)
 
   @@unique([sourceId, hash, version])
   @@unique([type, sourceId, version])
@@ -151,11 +87,4 @@ model SourceImage {
   @@index([sourceId])
   @@index([order], map: "idx_recipe_images_step_order")
   @@map("source_images")
-}
-
-enum source {
-  DOM
-  TEXT
-  GPT
-  OLLAMA
 }
