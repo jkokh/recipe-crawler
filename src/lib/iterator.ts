@@ -87,7 +87,28 @@ export class PaginatedIterator<T> {
     }
 
     /**
-     * NEW METHOD: Process items in batches and call callback with each page's results
+     * Internal helper: safely perform a count, with fallback for Prisma JsonNull/DbNull filters.
+     */
+    private async safeCount(where?: any): Promise<number> {
+        try {
+            return await this.delegate.count(where ? { where } : {});
+        } catch (err: any) {
+            if (err.name === 'PrismaClientValidationError') {
+                console.warn(
+                    '[iterator] .count() failed (likely JsonNull filter) — falling back to .findMany().length'
+                );
+                const rows = await this.delegate.findMany({
+                    ...(where ? { where } : {}),
+                    select: { id: true }
+                });
+                return rows.length;
+            }
+            throw err;
+        }
+    }
+
+    /**
+     * Process items page by page and run a callback on each page.
      */
     async getPageResults<R = void>(
         processPageFunction: (items: T[]) => Promise<R> | R
@@ -102,7 +123,7 @@ export class PaginatedIterator<T> {
 
         const finalQueryArgs = this.customQuery || this.queryArgs;
         const countArgs = finalQueryArgs.where ? { where: finalQueryArgs.where } : {};
-        const totalCount = await this.delegate.count(countArgs);
+        const totalCount = await this.safeCount(countArgs.where);
         const calculatedMaxPages = Math.ceil(totalCount / perPage);
         const pagesToProcess = maxPages ? Math.min(calculatedMaxPages, maxPages) : calculatedMaxPages;
 
@@ -122,7 +143,6 @@ export class PaginatedIterator<T> {
             });
 
             try {
-                // Call the callback with the entire page of items
                 await processPageFunction(items);
             } catch (error: any) {
                 console.error(`Error processing page ${currentPage}:`, error.message);
@@ -132,7 +152,9 @@ export class PaginatedIterator<T> {
 
             console.log(`Completed page ${currentPage}: ${items.length} ${entityName} processed`);
             console.log(
-                `Total progress: ${totalProcessed}/${totalCount} (${Math.round((totalProcessed / totalCount) * 100)}%)`
+                `Total progress: ${totalProcessed}/${totalCount} (${Math.round(
+                    (totalProcessed / totalCount) * 100
+                )}%)`
             );
 
             currentPage++;
@@ -145,8 +167,9 @@ export class PaginatedIterator<T> {
         console.log(`Batch iteration complete: processed ${totalProcessed} ${entityName}`);
     }
 
-
-
+    /**
+     * Iterate through all pages and process each item individually with async callback.
+     */
     async forEachAsync<R = void>(
         processFunction: (item: T) => Promise<R> | R
     ): Promise<void> {
@@ -160,7 +183,7 @@ export class PaginatedIterator<T> {
 
         const finalQueryArgs = this.customQuery || this.queryArgs;
         const countArgs = finalQueryArgs.where ? { where: finalQueryArgs.where } : {};
-        const totalCount = await this.delegate.count(countArgs);
+        const totalCount = await this.safeCount(countArgs.where);
         const calculatedMaxPages = Math.ceil(totalCount / perPage);
         const pagesToProcess = maxPages ? Math.min(calculatedMaxPages, maxPages) : calculatedMaxPages;
 
@@ -181,14 +204,17 @@ export class PaginatedIterator<T> {
 
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
-                const currentItemNumber = totalProcessed + i + 1; // Global item number
+                const currentItemNumber = totalProcessed + i + 1;
 
                 try {
-                    //console.log(`Processing item ${currentItemNumber}/${totalCount}...`);
                     await processFunction(item);
                 } catch (error: any) {
-                    const itemId = item && typeof item === 'object' && 'id' in item ? (item as any).id : 'unknown';
-                    console.error(`Error processing item ${currentItemNumber} (ID: ${itemId}):`, error.message);
+                    const itemId =
+                        item && typeof item === 'object' && 'id' in item ? (item as any).id : 'unknown';
+                    console.error(
+                        `Error processing item ${currentItemNumber} (ID: ${itemId}):`,
+                        error.message
+                    );
                 }
             }
 
@@ -196,7 +222,9 @@ export class PaginatedIterator<T> {
 
             console.log(`Completed page ${currentPage}: ${items.length} ${entityName} processed`);
             console.log(
-                `Total progress: ${totalProcessed}/${totalCount} (${Math.round((totalProcessed / totalCount) * 100)}%)`
+                `Total progress: ${totalProcessed}/${totalCount} (${Math.round(
+                    (totalProcessed / totalCount) * 100
+                )}%)`
             );
 
             currentPage++;
@@ -218,7 +246,7 @@ export function iterate<T>(delegate: any): PaginatedIterator<T> {
 }
 
 /**
- * Legacy function for backward compatibility
+ * Legacy compatibility wrapper
  */
 export async function iterateQuery<T, R = void>(
     delegate: any,
@@ -242,9 +270,14 @@ export async function iterateQuery<T, R = void>(
     return iterator.forEachAsync(processFunction);
 }
 
+/**
+ * Close Prisma connection
+ */
 export async function closeConnection() {
     await prisma.$disconnect();
 }
 
-// Export prisma instance for convenience
+/**
+ * Export shared Prisma instance
+ */
 export { prisma };

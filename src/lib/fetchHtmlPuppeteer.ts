@@ -5,9 +5,9 @@ import fs from "fs/promises";
 
 puppeteer.use(StealthPlugin());
 
-export async function launchBrowser() {
+export async function launchBrowser(headless: boolean) {
     return puppeteer.launch({
-        headless: false,
+        headless,
         executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
         args: [
             '--window-size=800,600',
@@ -49,7 +49,7 @@ export async function fetchHtmlWithPuppeteer(url: string, browser: any): Promise
 
 export async function downloadImageWithPuppeteer(imageUrl: string, filePath: string, referer: string) {
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
         args: [
             '--window-size=1200,1200',

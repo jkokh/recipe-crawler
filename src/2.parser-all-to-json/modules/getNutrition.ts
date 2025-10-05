@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import {Nutrition} from "../types";
 import {Source} from "@prisma/client";
 
-export const getNutrition = ($article: cheerio.Cheerio, source: Source): Nutrition | null => {
+export const getNutrition = ($article: cheerio.Cheerio): Nutrition | null => {
     const $ = cheerio.load($article[0]);
 
     // Find the nutrition label table

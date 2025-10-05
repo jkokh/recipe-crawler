@@ -4,10 +4,9 @@ import { PrismaClient, Source } from "@prisma/client";
 
 export async function saveImages(
     imagesParsed: ImagesParsed[],
-    source: Source,
+    sourceId: number,
     prisma: PrismaClient
 ): Promise<ImagesParsed[]> {
-    const sourceId = source.id;
     const out: ImagesParsed[] = [];
 
     for (let index = 0; index < imagesParsed.length; index++) {

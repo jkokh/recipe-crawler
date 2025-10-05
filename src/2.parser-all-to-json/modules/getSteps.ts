@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import {Step} from "../types";
-import {Source} from "@prisma/client";
+import {Source, SourceImage} from "@prisma/client";
 import {getImageIds, hasLinks} from "./parserUtils";
 
 
@@ -9,7 +9,7 @@ interface StepsResult {
     needsReview: boolean;
 }
 
-export const getSteps = ($article: cheerio.Cheerio, source: Source): StepsResult  => {
+export const getSteps = ($article: cheerio.Cheerio, sourceImages: SourceImage[]): StepsResult  => {
 
     const $ = cheerio.load($article[0]);
 
@@ -42,7 +42,7 @@ export const getSteps = ($article: cheerio.Cheerio, source: Source): StepsResult
             needsReview = true;
         }
 
-        const images = getImageIds($step, source);
+        const images = getImageIds($step, sourceImages);
 
         data.push({
             title,

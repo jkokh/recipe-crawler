@@ -15,11 +15,10 @@ async function main() {
                 { htmlContent: '' }
             ]
         },
-        take: 100,
         orderBy: { id: 'asc' },
     });
 
-    const browser = await launchBrowser();
+    const browser = await launchBrowser(true);
     for (const recipe of recipeUrls) {
         try {
             console.log(`Fetching: ${recipe.recipeUrl}`);

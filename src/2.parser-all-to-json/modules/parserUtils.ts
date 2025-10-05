@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import {Source} from "@prisma/client";
+import {SourceImage} from "@prisma/client";
 import {stableIdFromUrl} from "./getImages";
 
 export function getSimplyDataSrc(el: cheerio.Cheerio): string[] {
@@ -19,9 +19,9 @@ export function getSimplyDataSrc(el: cheerio.Cheerio): string[] {
     return urls;
 }
 
-export function getImageIds(element: cheerio.Cheerio, source: Source): number[] {
+export function getImageIds(element: cheerio.Cheerio, src: SourceImage[] = []): number[] {
     const imageUrls = getSimplyDataSrc(element)
-    const src = (source as any).sourceImages ?? [];
+
     if (!imageUrls?.length || !src.length) return [];
 
     const stableIdToId = new Map(

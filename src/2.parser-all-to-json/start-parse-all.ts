@@ -1,70 +1,177 @@
 import * as cheerio from "cheerio";
-import {iterate, prisma} from "../lib/iterator";
-import {getTitle} from "./modules/getTitle";
-import {getIngredients} from "./modules/getIngredients";
-import {getNutrition} from "./modules/getNutrition";
-import {getSteps} from "./modules/getSteps";
-import {getParagraphs} from "./modules/getParagraphs";
-import {getRecipeMeta} from "./modules/getMeta";
-import {RecipeJson} from "../types";
-import {Prisma, Source} from "@prisma/client";
-import {parseImages} from "./modules/getImages";
-import {saveImages} from "./modules/saveImages";
+import { Prisma, PrismaClient, Source } from "@prisma/client";
+import { getTitle } from "./modules/getTitle";
+import { getIngredients } from "./modules/getIngredients";
+import { getNutrition } from "./modules/getNutrition";
+import { getSteps } from "./modules/getSteps";
+import { getParagraphs } from "./modules/getParagraphs";
+import { getRecipeMeta } from "./modules/getMeta";
+import { parseImages } from "./modules/getImages";
+import { saveImages } from "./modules/saveImages";
+import { RecipeJson } from "../types";
+
+const prisma = new PrismaClient();
+
+/**
+ * Configuration for parsing behavior
+ */
+interface ParseConfig {
+    skipExisting?: boolean;
+    updateFields?: Array<keyof RecipeJson>;
+    alwaysReparseImages?: boolean;
+}
+
+/**
+ * Default configuration
+ */
+const DEFAULT_CONFIG: ParseConfig = {
+    skipExisting: false,
+    updateFields: undefined,
+    alwaysReparseImages: false
+};
+
+/**
+ * Helper: pick selected fields from source
+ */
+function pickFields<T extends object>(
+    source: T,
+    target: Partial<T>,
+    fields: Array<keyof T>
+): Partial<T> {
+    const result = { ...target };
+    for (const field of fields) {
+        result[field] = source[field];
+    }
+    return result;
+}
+
+/**
+ * Main processor
+ */
+export async function process(config: ParseConfig = DEFAULT_CONFIG) {
+    const finalConfig = { ...DEFAULT_CONFIG, ...config };
+
+    const perPage = 50;
+    let page = 0;
+    let totalProcessed = 0;
+
+    const where: Prisma.SourceWhereInput = finalConfig.skipExisting
+        ? ({
+            OR: [
+                { jsonParsed: { equals: Prisma.DbNull as any } },
+                { jsonParsed: { equals: Prisma.JsonNull as any } },
+                { jsonParsed: { equals: null as any } }
+            ]
+        } as Prisma.SourceWhereInput)
+        : {};
 
 
-export async function process() {
-    await iterate(prisma.source)
-        .select({
-            id: true,
-            recipeUrl: true,
-            json: true,
-            htmlContent: true,
-            sourceImages: true
-        })
-        .where({
 
-        })
-        .startPosition(1)
-        .perPage(50)
-        .entityName('recipes')
-        .forEachAsync(async (source: Source) => {
-            const html = source.htmlContent!;
-            const $ = cheerio.load(html);
-            const $article = $('article');
+    const totalCount = await prisma.source.count({ where });
+    console.log(`Found ${totalCount} sources to process.`);
 
-            let images = parseImages($article);
-            images = await saveImages(images, source, prisma);
-
-            const meta = getRecipeMeta($article, source);
-            const title = getTitle($article, source);
-            const ingredients = getIngredients($article);
-            const nutrition = getNutrition($article, source);
-            const steps = getSteps($article, source);
-            const paragraphs = getParagraphs($article, source);
-            const jsonParsed: RecipeJson = {
-                title,
-                ingredients: ingredients.data,
-                nutrition,
-                steps: steps.data,
-                paragraphs,
-                meta,
-                categories: [],
-                images
-            }
-            await prisma.source.update({
-                where: {
-                    id: source.id
-                },
-                data: {
-                    jsonParsed: jsonParsed as Prisma.InputJsonValue
-                }
-            });
+    while (true) {
+// ✅ final preferred version
+        const sources = await prisma.source.findMany({
+            where,
+            select: {
+                id: true,
+                recipeUrl: true,
+                htmlContent: true,
+                jsonParsed: true,
+                sourceImages: true
+            },
+            take: perPage,
+            skip: page * perPage
         });
 
+
+        if (sources.length === 0) break;
+
+        console.log(`Processing page ${page + 1} (${sources.length} items)`);
+
+        for (const source of sources) {
+            if (!source.htmlContent) {
+                console.warn(`[${source.id}] Skipped (no HTML content)`);
+                continue;
+            }
+
+            const $ = cheerio.load(source.htmlContent);
+            const $article = $("article");
+
+            try {
+                // Parse and save images
+                let images = parseImages($article);
+                images = await saveImages(images, source.id, prisma);
+
+                // Parse structured recipe data
+                const meta = getRecipeMeta($article);
+                const title = getTitle($article);
+                const ingredients = getIngredients($article);
+                const nutrition = getNutrition($article);
+                const steps = getSteps($article, source.sourceImages);
+                const paragraphs = getParagraphs($article, source.sourceImages);
+
+                const newData: RecipeJson = {
+                    title,
+                    ingredients: ingredients.data,
+                    nutrition,
+                    steps: steps.data,
+                    paragraphs,
+                    meta,
+                    categories: [],
+                    images
+                };
+
+                let finalData: RecipeJson;
+
+                if (finalConfig.updateFields && finalConfig.updateFields.length > 0) {
+                    const existingData = (source.jsonParsed as RecipeJson) || ({} as RecipeJson);
+                    const updates = pickFields(newData, {}, finalConfig.updateFields);
+                    finalData = { ...existingData, ...updates };
+                    console.log(
+                        `[${source.id}] Partial update: ${finalConfig.updateFields.join(", ")}`
+                    );
+                } else {
+                    finalData = newData;
+                    console.log(`[${source.id}] Full replacement`);
+                }
+
+                await prisma.source.update({
+                    where: { id: source.id },
+                    data: {
+                        jsonParsed: finalData as Prisma.InputJsonValue
+                    }
+                });
+
+                totalProcessed++;
+            } catch (err: any) {
+                console.error(`[${source.id}] Error parsing:`, err.message);
+            }
+        }
+
+        console.log(
+            `Completed page ${page + 1}. Total processed: ${totalProcessed}/${totalCount}`
+        );
+
+        page++;
+        if (page * perPage >= totalCount) break;
+    }
+
+    console.log(`✅ All done! Processed ${totalProcessed} sources.`);
 }
 
+/**
+ * Entrypoint
+ */
 async function main() {
-    try { await process(); }
-    catch (error) { console.error('Error processing recipes:', error); }
+    try {
+        await process({ skipExisting: true });
+    } catch (error) {
+        console.error("Error processing recipes:", error);
+    } finally {
+        await prisma.$disconnect();
+    }
 }
+
 void main();

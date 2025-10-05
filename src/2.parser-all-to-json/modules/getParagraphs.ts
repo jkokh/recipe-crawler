@@ -1,12 +1,12 @@
 import * as cheerio from "cheerio";
 import {Paragraph} from "../types";
-import {getImageIds, getSimplyDataSrc, hasLinks} from "./parserUtils";
-import {Source} from "@prisma/client";
+import {getImageIds, hasLinks} from "./parserUtils";
+import {SourceImage} from "@prisma/client";
 
 
 export type ParagraphsResult = Paragraph[] | null;
 
-export const getParagraphs = ($article: cheerio.Cheerio, source: Source): ParagraphsResult => {
+export const getParagraphs = ($article: cheerio.Cheerio, sourceImages: SourceImage[]): ParagraphsResult => {
     const $ = cheerio.load($article[0]);
 
     const $paragraphs = $('.article-content-container');
@@ -78,7 +78,7 @@ export const getParagraphs = ($article: cheerio.Cheerio, source: Source): Paragr
                 paragraph.list = list;
             }
         }
-        const images = getImageIds($(element), source);
+        const images = getImageIds($(element), sourceImages);
 
         if (images.length > 0) {
             paragraph.images = images;
