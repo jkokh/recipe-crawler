@@ -32,6 +32,11 @@ async function run() {
             const recipeTitle = recipeJson.title;
             const recipeContext = `"${recipeTitle}" (Source ID: ${source.id})`;
 
+            if (recipeJson.tags && recipeJson.tags.length > 0) {
+                skipped++;
+                continue;
+            }
+
             const validExistingTags = validateExistingTags(recipeJson.tags, tagsCache);
 
             if (MERGE_TAGS && validExistingTags.length >= 3) {

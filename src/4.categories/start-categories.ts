@@ -25,6 +25,13 @@ export async function process(): Promise<void> {
             .forEachAsync(async (source: Source) => {
                 const json = source!.jsonParsed as RecipeJson;
 
+                // Skip if jsonParsed is null
+                if (!json) {
+                    console.warn(`[${source.id}] Skipped (no jsonParsed data)`);
+                    sourcesSkipped++;
+                    return;
+                }
+
                 // Skip if categories already exist
                 if (json.categories && json.categories.length > 0) {
                     sourcesSkipped++;
@@ -34,7 +41,7 @@ export async function process(): Promise<void> {
                 const categoryString = processor.getCategories(source);
                 const ids = await querier(json, categoryString);
 
-                console.log(`\n=== ${json.title} ===`);
+                console.log(`\n=== Source ID: ${source.id}, ${json.title} ===`);
                 console.log(categoryString);
                 console.log('Result:');
                 console.log(ids);
