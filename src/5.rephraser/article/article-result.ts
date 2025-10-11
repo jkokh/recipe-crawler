@@ -19,8 +19,8 @@ async function main() {
 
     await processor.fetchResults(
         prisma,
-        "paragraphs for 157",  // type: identifier for this rewrite job
-        VERSION                  // version: version of the rewrite
+        "paragraph",
+        VERSION
     );
 
     await prisma.$disconnect();
