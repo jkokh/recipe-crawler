@@ -4,6 +4,8 @@ import { RecipeJson } from "../types";
 import {CategoryProcessor} from "../lib/CategoryProcessor";
 import {querier} from "./querier";
 import {Source} from "@prisma/client";
+import {VERSION} from "../constants";
+
 
 export async function process(): Promise<void> {
     const categoryManager = new CategoryManager(prisma);
@@ -19,6 +21,9 @@ export async function process(): Promise<void> {
             .select({
                 id: true,
                 jsonParsed: true
+            })
+            .where({
+                version: VERSION
             })
             .startPosition(1)
             .perPage(50)

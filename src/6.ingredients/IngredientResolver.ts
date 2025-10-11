@@ -9,6 +9,8 @@ Purpose: Resolves ingredient IDs for each source recipe without generating new i
 import { PrismaClient } from '@prisma/client';
 import { IngredientEnricher } from './IngredientEnricher';
 import { RecipeJson } from './types';
+import {VERSION} from "../constants";
+
 
 export class IngredientResolver {
     private readonly batchSize = 100;
@@ -22,7 +24,8 @@ export class IngredientResolver {
         console.log('\nPhase 2: Resolving ingredient IDs...');
 
         const sources = await this.prisma.source.findMany({
-            select: { id: true, jsonParsed: true }
+            select: { id: true, jsonParsed: true },
+            where: { version: VERSION }
         });
 
         let processed = 0;

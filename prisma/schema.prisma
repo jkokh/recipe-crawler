@@ -46,13 +46,13 @@ model Phrase {
   sourceId  Int      @map("source_id")
   type      String   @default("default") @db.VarChar(32)
   version   String   @default("default") @db.VarChar(32)
+  index     Int      @default(0)
   hash      String   @default("") @db.VarChar(64)
   text      String   @db.LongText
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([sourceId, hash, version])
-  @@unique([type, sourceId, version])
+  @@unique([sourceId, hash, version, index])
   @@map("phrases")
 }
 
@@ -63,10 +63,12 @@ model Source {
   htmlContent  String?       @map("html_content") @db.LongText
   jsonParsed   Json?         @map("json_parsed")
   jsonAltered  Json?         @map("json_altered")
+  version      String        @default("v1") @db.VarChar(16)
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
   sourceImages SourceImage[]
 
+  @@index([version])
   @@map("sources")
 }
 

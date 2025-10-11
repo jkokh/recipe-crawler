@@ -127,35 +127,6 @@ export class ClaudeBatchProvider implements AIProvider {
         }
     }
 
-    // Check batch status
-    async getBatchStatus(batchId: string): Promise<BatchStatus> {
-        try {
-            const batchData = await this.client.messages.batches.retrieve(batchId);
-
-            const statusMap: Record<string, BatchStatus['status']> = {
-                'in_progress': 'in_progress',
-                'canceling': 'in_progress',
-                'ended': 'completed',
-                'failed': 'failed',
-                'expired': 'expired'
-            };
-
-            return {
-                id: batchData.id,
-                status: statusMap[batchData.processing_status] || 'validating',
-                processingStats: {
-                    processing: batchData.request_counts.processing,
-                    succeeded: batchData.request_counts.succeeded,
-                    errored: batchData.request_counts.errored,
-                    canceled: batchData.request_counts.canceled,
-                    expired: batchData.request_counts.expired,
-                },
-            };
-        } catch (error: any) {
-            throw new Error(`Failed to get batch status: ${this.formatError(error)}`);
-        }
-    }
-
     async getBatchResults(batchId: string): Promise<BatchResult[]> {
         try {
             const resultsIter = await this.client.messages.batches.results(batchId);

@@ -8,3 +8,7 @@ Run
 
 To clean up DB / purge cache run RESET MASTER;
 Restart the container.
+
+
+1. Copy sitemap and run run-sitemap-parser.ts
+2. Run html-fetch / contentGrabber.ts

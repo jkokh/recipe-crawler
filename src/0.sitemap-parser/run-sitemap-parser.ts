@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import { parseStringPromise } from 'xml2js';
 import { sitemapsConfig } from './config.js';
 import { PrismaClient } from '@prisma/client';
+import {VERSION} from "../constants";
 
 const prisma = new PrismaClient();
 
@@ -51,7 +52,7 @@ async function saveUrlsToDb(urls: { loc: string, lastmod?: string | null }[], st
             if (!existing) {
                 // New record - create it
                 await prisma.source.create({
-                    data: { recipeUrl: loc, recipeDate: newDate }
+                    data: { recipeUrl: loc, recipeDate: newDate, version: VERSION }
                 });
                 batchNew++;
                 stats.newRecords++;

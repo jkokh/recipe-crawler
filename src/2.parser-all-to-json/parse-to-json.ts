@@ -9,6 +9,7 @@ import { getRecipeMeta } from "./modules/getMeta";
 import { parseImages } from "./modules/getImages";
 import { saveImages } from "./modules/saveImages";
 import { RecipeJson } from "../types";
+import {VERSION} from "../constants";
 
 const prisma = new PrismaClient();
 
@@ -60,7 +61,9 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
                 { jsonParsed: { equals: null as any } }
             ]
         } as Prisma.SourceWhereInput)
-        : {};
+        : {
+            version: VERSION
+        };
 
     const totalCount = await prisma.source.count({ where });
     console.log(`Found ${totalCount} sources to process.`);
@@ -160,7 +163,7 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
  */
 async function main() {
     try {
-        await process({ skipExisting: true });
+        await process({ skipExisting: false });
     } catch (error) {
         console.error("Error processing recipes:", error);
     } finally {

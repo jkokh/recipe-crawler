@@ -3,6 +3,7 @@ import { PrismaClient, Prisma } from '@prisma/client';
 import { querier } from './querier';
 import {loadTagsCache, resolveTagsToIds, mergeTagIds, validateExistingTags} from './utils';
 import type { RecipeJson } from '../types';
+import {VERSION} from "../constants";
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,8 @@ async function run() {
 
         const sources = await prisma.source.findMany({
             select: { id: true, jsonParsed: true },
-            orderBy: { id: 'asc' }
+            orderBy: { id: 'asc' },
+            where: { version: VERSION }
         });
 
         console.log(`Found ${sources.length} sources to process\n`);

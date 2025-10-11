@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import {fetchHtmlWithPuppeteer, launchBrowser} from "../lib/fetchHtmlPuppeteer";
+import {VERSION} from "../constants";
+
+const HEADLESS = true;
 
 const prisma = new PrismaClient();
 
@@ -13,12 +16,13 @@ async function main() {
             OR: [
                 { htmlContent: null },
                 { htmlContent: '' }
-            ]
+            ],
+            version: VERSION
         },
         orderBy: { id: 'asc' },
     });
 
-    const browser = await launchBrowser(true);
+    const browser = await launchBrowser(HEADLESS);
     for (const recipe of recipeUrls) {
         try {
             console.log(`Fetching: ${recipe.recipeUrl}`);

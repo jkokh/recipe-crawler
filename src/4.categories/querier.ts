@@ -11,12 +11,9 @@ export async function querier(recipeJson: RecipeJson, categories: string): Promi
         returnJsonStructure: { categories: "number[]" }
     });
 
-    delete recipeJson.meta;
-    delete recipeJson.nutrition;
-    delete recipeJson.images;
-    delete recipeJson.categories;
+    const { meta, nutrition, images, categories: _, ...cleanRecipe } = recipeJson;
 
-    const prmpt = prompts[0].replace('<%data%>', JSON.stringify(recipeJson)).replace('<%categories%>', categories);
+    const prmpt = prompts[0].replace('<%data%>', JSON.stringify(cleanRecipe)).replace('<%categories%>', categories);
 
     const result = await pipeline<string>()
         .step(
