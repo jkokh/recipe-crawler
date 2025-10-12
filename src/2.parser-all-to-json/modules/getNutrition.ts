@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
-import {Nutrition} from "../types";
-import {Source} from "@prisma/client";
+import {Nutrition} from "../../types";
+
 
 export const getNutrition = ($article: cheerio.Cheerio): Nutrition | null => {
     const $ = cheerio.load($article[0]);

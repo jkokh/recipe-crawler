@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
-import {Ingredient} from "../types";
+import {Ingredient} from "../../types";
+
 
 interface IngredientsResult {
     data: Ingredient[] | null;
@@ -19,7 +20,7 @@ export const getIngredients = ($article: cheerio.Cheerio): IngredientsResult => 
     const needsReview = false;
 
     // Find all ingredient list items
-    $ingredients.each((index, element) => {
+    $ingredients.each((_index, element) => {
         const $item = $(element);
 
         // Extract ingredient parts

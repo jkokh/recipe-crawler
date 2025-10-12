@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
-import {Paragraph} from "../types";
 import {getImageIds, hasLinks} from "./parserUtils";
 import {SourceImage} from "@prisma/client";
+import {Paragraph} from "../../types";
 
 
 export type ParagraphsResult = Paragraph[] | null;

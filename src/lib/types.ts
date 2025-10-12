@@ -9,7 +9,6 @@ export interface AIRequestOptions {
 }
 
 export interface AIProvider {
-
   ask<T = any>(
     prompt: string | any,
     model?: string,
@@ -17,10 +16,4 @@ export interface AIProvider {
     options?: AIRequestOptions,
     jsonStructure?: any
   ): Promise<T>;
-}
-
-export interface RecipeContent {
-  title: string;
-  description: string;
-  seo: string;
 }

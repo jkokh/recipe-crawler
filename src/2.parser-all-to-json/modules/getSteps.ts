@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
-import {Step} from "../types";
 import {SourceImage} from "@prisma/client";
 import {getImageIds} from "./parserUtils";
+import {Step} from "../../types";
 
 
 export const getSteps = ($article: cheerio.Cheerio, sourceImages: SourceImage[]): Step[] | null  => {

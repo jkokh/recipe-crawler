@@ -8,8 +8,8 @@ Purpose: Resolves ingredient IDs for each source recipe without generating new i
 */
 import { PrismaClient } from '@prisma/client';
 import { IngredientEnricher } from './IngredientEnricher';
-import { RecipeJson } from './types';
 import {VERSION} from "../constants";
+import {RecipeJson} from "../types";
 
 
 export class IngredientResolver {

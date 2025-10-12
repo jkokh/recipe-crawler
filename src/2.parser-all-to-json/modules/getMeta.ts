@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
-import {RecipeMeta} from "../types";
+import {RecipeMeta} from "../../types";
+
 
 export const getRecipeMeta = ($article: cheerio.Cheerio): RecipeMeta | null => {
     const $ = cheerio.load($article[0]);

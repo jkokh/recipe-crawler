@@ -8,7 +8,8 @@ Purpose: Builds an ingredient dictionary by scanning all source.recipe JSONs for
 */
 import { PrismaClient } from "@prisma/client";
 import { IngredientNormalizer } from './IngredientNormalizer';
-import type { RecipeJson } from './types';
+import {RecipeJson} from "../types";
+
 
 export class DictionaryBuilder {
     private readonly minFrequency = 2;

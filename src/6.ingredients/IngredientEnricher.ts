@@ -6,7 +6,8 @@ Purpose: Enriches existing ingredient items by assigning ingredientId based on n
 - Returns the same items with ingredientId populated (or null when not found)
 */
 import { IngredientNormalizer } from './IngredientNormalizer';
-import { IngredientItem } from './types';
+import {IngredientItem} from "../types";
+
 
 export class IngredientEnricher {
     static enrich(
