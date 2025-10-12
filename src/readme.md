@@ -11,4 +11,4 @@ Restart the container.
 
 
 1. Copy sitemap and run run-sitemap-parser.ts
-2. Run html-fetch / contentGrabber.ts
+2. Run html-fetch / html-fetch.ts
