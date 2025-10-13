@@ -46,7 +46,7 @@ async function processSource(
 
 export async function processAlter(): Promise<void> {
     const sources = await prisma.source.findMany({
-        //where: { version: VERSION },
+        where: { version: VERSION },
         select: {
             id: true,
             jsonParsed: true

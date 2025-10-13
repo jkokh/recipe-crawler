@@ -24,9 +24,7 @@ async function main() {
     const sources = await prisma.source.findMany({
         select: { id: true, jsonParsed: true },
         where: {
-            version: {
-                not: VERSION
-            }
+            version: VERSION
         },
         orderBy: { id: "asc" },
         //take: 2

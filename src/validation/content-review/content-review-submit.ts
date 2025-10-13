@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/iterator";
 import { RecipeJson } from "../../types";
 import { OpenAIBatchProcessor } from "../../lib/OpenAIBatchProcessor";
-import { BATCH_ID_FILE } from "../../constants";
+import {BATCH_ID_FILE, VERSION} from "../../constants";
 
 /** Strict, deterministic prompt for content review */
 function makePrompt(text: string): string {
@@ -38,7 +38,8 @@ ${text}
 async function main() {
     const sources = await prisma.source.findMany({
         select: { id: true, jsonAltered: true },
-        where: { flagged: true, checked: false },
+        //where: { flagged: true, checked: false },
+        where: { version: VERSION },
         orderBy: { id: "asc" },
     });
 

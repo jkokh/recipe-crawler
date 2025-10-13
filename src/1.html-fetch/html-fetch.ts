@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import {fetchHtmlWithPuppeteer, launchBrowser} from "../lib/fetchHtmlPuppeteer";
 import {VERSION} from "../constants";
 
-const HEADLESS = true;
+const HEADLESS = false;
 
 const prisma = new PrismaClient();
 

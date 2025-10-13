@@ -63,7 +63,7 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
             ]
         } as Prisma.SourceWhereInput)
         : {
-            //version: VERSION
+            version: VERSION
         };
 
     const totalCount = await prisma.source.count({ where });
@@ -167,7 +167,7 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
 async function main() {
     try {
         //await process({ skipExisting: false });
-        await process({ skipExisting: false, updateFields: ["images"] });
+        await process({ skipExisting: false/*, updateFields: ["images"]*/ });
     } catch (error) {
         console.error("Error processing recipes:", error);
     } finally {
