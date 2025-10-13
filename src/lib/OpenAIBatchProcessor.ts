@@ -3,8 +3,8 @@ import fs from "fs";
 import path from "path";
 import { TextEncoder } from "util";
 import "dotenv/config";
-import { cryptoHash } from "../2.parser-all-to-json/modules/parserUtils";
 import {GPT_MODEL} from "../constants";
+import {cryptoHash} from "./utils";
 
 interface BatchRequest {
     customId: string;
@@ -29,6 +29,12 @@ interface CreateBatchOptions<T> {
     promptMaker: (text: string) => string;
 }
 
+interface BatchResult {
+    sourceId: number;
+    text: string;
+    customId: string;
+}
+
 export class OpenAIBatchProcessor<T = any> {
     private readonly client: OpenAI;
     private readonly model: string;
@@ -36,12 +42,14 @@ export class OpenAIBatchProcessor<T = any> {
     private readonly batchSize: number;
     private readonly defaultSystemPrompt = "You are a skilled editor. Follow the user's instructions precisely.";
     private readonly hashLength = 12;
+    private resultHandler?: (sourceId: number, text: string, original: string) => Promise<void>;
 
     constructor(config?: {
         apiKey?: string;
         model?: string;
         batchIdsFile?: string;
         batchSize?: number;
+        resultHandler?: (sourceId: number, text: string, original: string) => Promise<void>;
     }) {
         const apiKey = config?.apiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) throw new Error("OpenAI API key is required");
@@ -50,6 +58,7 @@ export class OpenAIBatchProcessor<T = any> {
         this.model = config?.model || GPT_MODEL;
         this.storagePath = config?.batchIdsFile || path.resolve("openai_batches.txt");
         this.batchSize = config?.batchSize || 50000;
+        this.resultHandler = config?.resultHandler;
     }
 
     private getTextHash(text: string): string {
@@ -168,6 +177,77 @@ export class OpenAIBatchProcessor<T = any> {
         }
     }
 
+    /**
+     * Fetches all batch results and returns them as an array (no side effects).
+     */
+    async fetchResultsArray(): Promise<BatchResult[]> {
+        if (!fs.existsSync(this.storagePath)) {
+            throw new Error(`❌ File not found: ${this.storagePath}`);
+        }
+
+        const batchIds = fs
+            .readFileSync(this.storagePath, "utf8")
+            .split("\n")
+            .map((l) => l.trim())
+            .filter(Boolean);
+
+        console.log(`📦 Processing ${batchIds.length} batches from ${this.storagePath}`);
+
+        const results: BatchResult[] = [];
+
+        for (const batchId of batchIds) {
+            const batchResults = await this.fetchBatchResults(batchId);
+            results.push(...batchResults);
+        }
+
+        console.log(`🏁 Fetched ${results.length} total results.`);
+        return results;
+    }
+
+    private async fetchBatchResults(batchId: string): Promise<BatchResult[]> {
+        console.log(`🔍 Fetching batch ${batchId}...`);
+
+        const batch = await this.client.batches.retrieve(batchId);
+        if (batch.status !== "completed" || !batch.output_file_id) {
+            console.log(`⚠️ Skipping batch ${batchId} (status: ${batch.status})`);
+            return [];
+        }
+
+        const content = await (await this.client.files.content(batch.output_file_id)).text();
+        const lines = content.split("\n").map((l) => l.trim()).filter(Boolean);
+        console.log(`📄 ${lines.length} results found in ${batchId}`);
+
+        const results: BatchResult[] = [];
+
+        for (const line of lines) {
+            try {
+                const data = JSON.parse(line);
+                const text = data.response?.body?.choices?.[0]?.message?.content?.trim();
+                const customId = data.custom_id;
+
+                if (!text || !customId) continue;
+
+                const { sourceId } = decodeCustomId(customId);
+                const sourceIdNum = Number(sourceId);
+
+                if (isNaN(sourceIdNum)) {
+                    console.error(`❌ Invalid sourceId: ${sourceId} from customId: ${customId}`);
+                    continue;
+                }
+
+                results.push({
+                    sourceId: sourceIdNum,
+                    text,
+                    customId,
+                });
+            } catch (err) {
+                console.error("❌ Parse error:", err);
+            }
+        }
+
+        return results;
+    }
+
     async fetchResults(prisma: any, type: string, version: string): Promise<void> {
         if (!fs.existsSync(this.storagePath)) {
             throw new Error(`❌ File not found: ${this.storagePath}`);
@@ -241,6 +321,11 @@ export class OpenAIBatchProcessor<T = any> {
             if (!original) {
                 console.log(`⚠️ Original text not found for ${sourceId}_${shortHash}`);
                 return;
+            }
+
+            // Call resultHandler if provided
+            if (this.resultHandler) {
+                await this.resultHandler(sourceIdNum, text, original);
             }
 
             const fullHash = cryptoHash(original);

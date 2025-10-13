@@ -66,6 +66,9 @@ model Source {
   version      String        @default("v1") @db.VarChar(16)
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
+  checked      Boolean       @default(false) @map("checked")
+  flagged      Boolean       @default(false) @map("flagged")
+  needsReview  String?       @map("needs_review") @db.LongText
   sourceImages SourceImage[]
 
   @@index([version])

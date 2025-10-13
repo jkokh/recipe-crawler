@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import {SourceImage} from "@prisma/client";
 import {stableIdFromUrl} from "./getImages";
 
@@ -37,8 +36,4 @@ export function getImageIds(element: cheerio.Cheerio, src: SourceImage[] = []): 
 
 export function hasLinks(el: cheerio.Cheerio): boolean {
     return el.find("a[href]").length > 0;
-}
-
-export function cryptoHash(str: string, algorithm: 'md5' | 'sha1' | 'sha256' = 'sha256'): string {
-    return crypto.createHash(algorithm).update(str).digest('hex');
 }

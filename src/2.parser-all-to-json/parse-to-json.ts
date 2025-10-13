@@ -10,6 +10,7 @@ import { parseImages } from "./modules/getImages";
 import { saveImages } from "./modules/saveImages";
 import { RecipeJson } from "../types";
 import {VERSION} from "../constants";
+import {cleanup} from "./modules/cleanup";
 
 const prisma = new PrismaClient();
 
@@ -62,7 +63,7 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
             ]
         } as Prisma.SourceWhereInput)
         : {
-            version: VERSION
+            //version: VERSION
         };
 
     const totalCount = await prisma.source.count({ where });
@@ -95,6 +96,8 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
 
             const $ = cheerio.load(source.htmlContent);
             const $article = $("article");
+            // Clean up unwanted elements
+            cleanup($article);
 
             try {
                 // Parse and save images
@@ -163,7 +166,8 @@ export async function process(config: ParseConfig = DEFAULT_CONFIG) {
  */
 async function main() {
     try {
-        await process({ skipExisting: false });
+        //await process({ skipExisting: false });
+        await process({ skipExisting: false, updateFields: ["images"] });
     } catch (error) {
         console.error("Error processing recipes:", error);
     } finally {

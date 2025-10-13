@@ -148,7 +148,7 @@ LIMIT 10;
 // run-tags.ts
 const MERGE_TAGS = true;  // Safe mode (default)
 
-// validate.ts
+// general-validate-data-integrity.ts
 MIN_TAGS = 3              // Recipe needs at least 3 tags
 MAX_TAGS = 12             // Won't create more than 12
 

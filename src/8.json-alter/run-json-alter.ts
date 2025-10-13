@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { RecipeJson } from "../types";
 import { VERSION } from "../constants";
-import { alterParagraphs, alterSteps, getPhrasedText } from "./utils";
+import {alterImages, alterParagraphs, alterSteps, getPhrasedText} from "./utils";
 
 const prisma = new PrismaClient();
 
@@ -29,7 +29,8 @@ async function processSource(
             ...jsonParsed,
             title: alteredTitle,
             paragraphs: await alterParagraphs(source.id, jsonParsed.paragraphs, prisma),
-            steps: await alterSteps(source.id, jsonParsed.steps, prisma)
+            steps: await alterSteps(source.id, jsonParsed.steps, prisma),
+            images: await alterImages(source.id, jsonParsed.images, prisma),
         };
 
         await prisma.source.update({

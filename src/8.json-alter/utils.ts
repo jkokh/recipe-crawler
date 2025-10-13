@@ -1,10 +1,7 @@
-import crypto from "crypto";
 import { Paragraph, Step } from "../types";
-import { PrismaClient } from "@prisma/client";
+import {PrismaClient, SourceImage} from "@prisma/client";
+import {cryptoHash} from "../lib/utils";
 
-export function generateHash(text: string): string {
-    return crypto.createHash("sha256").update(text).digest("hex");
-}
 
 export async function getPhrasedText(
     sourceId: number,
@@ -13,7 +10,7 @@ export async function getPhrasedText(
 ): Promise<string | null> {
     if (!originalText) return null;
 
-    const hash = generateHash(originalText);
+    const hash = cryptoHash(originalText);
 
     const phrase = await prisma.phrase.findFirst({
         where: {
@@ -90,6 +87,30 @@ export async function alterSteps(
         }
 
         altered.push(alteredStep);
+    }
+
+    return altered;
+}
+
+export async function alterImages(
+    sourceId: number,
+    images: SourceImage[] | null,
+    prisma: PrismaClient
+): Promise<SourceImage[] | null> {
+    if (!images || images.length === 0) return images;
+
+    const altered: SourceImage[] = [];
+
+    for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        const alteredImage: SourceImage = { ...image };
+
+        if (image.alt) {
+            const rephrased = await getPhrasedText(sourceId, image.alt, prisma);
+            if (rephrased) alteredImage.alt = rephrased;
+        }
+
+        altered.push(alteredImage);
     }
 
     return altered;

@@ -10,7 +10,7 @@ export type RecipeJson = {
     meta?: RecipeMeta | null;
     categories?: number[];
     tags?: number[];
-    images?: SourceImage[] | null;
+    images: SourceImage[] | null;
 }
 
 export type ImagesParsed = {
