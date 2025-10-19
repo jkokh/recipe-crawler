@@ -123,6 +123,7 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.RecipeScalarFieldEnum = {
   id: 'id',
   sourceId: 'sourceId',
+  source: 'source',
   title: 'title',
   slug: 'slug',
   json: 'json',
@@ -149,6 +150,30 @@ exports.Prisma.IngredientScalarFieldEnum = {
   slug: 'slug'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  username: 'username',
+  password: 'password',
+  firstname: 'firstname',
+  lastname: 'lastname',
+  role: 'role',
+  verifyToken: 'verifyToken',
+  resetToken: 'resetToken',
+  emailVerified: 'emailVerified',
+  tokenCreatedAt: 'tokenCreatedAt',
+  resetTokenCreatedAt: 'resetTokenCreatedAt',
+  createdAt: 'createdAt',
+  birthdate: 'birthdate',
+  gender: 'gender'
+};
+
+exports.Prisma.TokenValidityScalarFieldEnum = {
+  userId: 'userId',
+  deviceId: 'deviceId',
+  validFrom: 'validFrom'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -173,13 +198,24 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.Role = exports.$Enums.Role = {
+  USER: 'USER',
+  SUPERADMIN: 'SUPERADMIN'
+};
 
+exports.Gender = exports.$Enums.Gender = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE',
+  OTHER: 'OTHER'
+};
 
 exports.Prisma.ModelName = {
   Recipe: 'Recipe',
   Category: 'Category',
   Tag: 'Tag',
-  Ingredient: 'Ingredient'
+  Ingredient: 'Ingredient',
+  User: 'User',
+  TokenValidity: 'TokenValidity'
 };
 
 /**

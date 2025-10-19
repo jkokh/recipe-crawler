@@ -58,19 +58,21 @@ model Phrase {
 }
 
 model Source {
-  id           Int           @id @default(autoincrement()) @map("id")
-  recipeUrl    String        @unique @map("recipe_url")
-  recipeDate   DateTime?     @map("recipe_date")
-  htmlContent  String?       @map("html_content") @db.LongText
-  jsonParsed   Json?         @map("json_parsed")
-  jsonAltered  Json?         @map("json_altered")
-  version      String        @default("v1") @db.VarChar(16)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
-  checked      Boolean       @default(false) @map("checked")
-  flagged      Boolean       @default(false) @map("flagged")
-  needsReview  String?       @map("needs_review") @db.LongText
-  sourceImages SourceImage[]
+  id               Int               @id @default(autoincrement()) @map("id")
+  source           String?           @db.VarChar(16)
+  recipeUrl        String            @unique @map("recipe_url")
+  recipeDate       DateTime?         @map("recipe_date")
+  htmlContent      String?           @map("html_content") @db.LongText
+  jsonParsed       Json?             @map("json_parsed")
+  jsonAltered      Json?             @map("json_altered")
+  version          String            @default("v1") @db.VarChar(16)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @default(now()) @updatedAt @map("updated_at")
+  checked          Boolean           @default(false) @map("checked")
+  flagged          Boolean           @default(false) @map("flagged")
+  needsReview      String?           @map("needs_review") @db.LongText
+  sourceImages     SourceImage[]
+  publicationQueue PublicationQueue?
 
   @@index([version])
   @@map("sources")
@@ -93,4 +95,23 @@ model SourceImage {
   @@index([sourceId])
   @@index([order], map: "idx_recipe_images_step_order")
   @@map("source_images")
+}
+
+model PublicationQueue {
+  id          Int               @id @default(autoincrement()) @map("id")
+  sourceId    Int               @unique @map("source_id")
+  scheduledAt DateTime          @map("scheduled_at")
+  status      PublicationStatus @default(pending) @map("status")
+  source      Source            @relation(fields: [sourceId], references: [id])
+
+  @@index([scheduledAt], map: "idx_pubq_scheduled_at")
+  @@index([status, scheduledAt], map: "idx_pubq_status_scheduled_at")
+  @@map("publication_queue")
+}
+
+enum PublicationStatus {
+  pending
+  published
+  failed
+  canceled
 }

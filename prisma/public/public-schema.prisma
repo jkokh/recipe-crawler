@@ -11,6 +11,7 @@ datasource db {
 model Recipe {
   id          Int      @id @default(autoincrement())
   sourceId    Int      @unique
+  source      String?  @db.VarChar(16)
   title       String
   slug        String?  @unique
   json        Json
@@ -20,6 +21,8 @@ model Recipe {
   categories  Category[]   @relation("RecipeCategories")
   tags        Tag[]        @relation("RecipeTags")
   ingredients Ingredient[] @relation("RecipeIngredients")
+
+  User User[]
 }
 
 model Category {
@@ -42,4 +45,55 @@ model Ingredient {
   name    String
   slug    String   @unique
   recipes Recipe[] @relation("RecipeIngredients")
+}
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  email               String    @unique
+  username            String    @unique
+  password            String
+  firstname           String
+  lastname            String
+  role                Role      @default(USER)
+  verifyToken         String?   @unique
+  resetToken          String?   @unique
+  emailVerified       Boolean   @default(false)
+  tokenCreatedAt      DateTime? @default(now())
+  resetTokenCreatedAt DateTime? @default(now())
+  createdAt           DateTime  @default(now())
+  birthdate           DateTime?
+  gender              Gender?
+  Product             Recipe[]
+
+  @@index([tokenCreatedAt], map: "idx_tokenCreatedAt")
+}
+
+model TokenValidity {
+  userId    Int
+  deviceId  String
+  validFrom DateTime
+
+  @@id([userId, deviceId])
+}
+
+enum Role {
+  USER
+  SUPERADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum EntityType {
+  PRODUCT
+  CATEGORY
+  USER
+}
+
+enum FileExtension {
+  jpg
+  png
 }

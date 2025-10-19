@@ -43,6 +43,30 @@ export type Source = $Result.DefaultSelection<Prisma.$SourcePayload>
  * 
  */
 export type SourceImage = $Result.DefaultSelection<Prisma.$SourceImagePayload>
+/**
+ * Model PublicationQueue
+ * 
+ */
+export type PublicationQueue = $Result.DefaultSelection<Prisma.$PublicationQueuePayload>
+
+/**
+ * Enums
+ */
+export namespace $Enums {
+  export const PublicationStatus: {
+  pending: 'pending',
+  published: 'published',
+  failed: 'failed',
+  canceled: 'canceled'
+};
+
+export type PublicationStatus = (typeof PublicationStatus)[keyof typeof PublicationStatus]
+
+}
+
+export type PublicationStatus = $Enums.PublicationStatus
+
+export const PublicationStatus: typeof $Enums.PublicationStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -228,6 +252,16 @@ export class PrismaClient<
     * ```
     */
   get sourceImage(): Prisma.SourceImageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.publicationQueue`: Exposes CRUD operations for the **PublicationQueue** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PublicationQueues
+    * const publicationQueues = await prisma.publicationQueue.findMany()
+    * ```
+    */
+  get publicationQueue(): Prisma.PublicationQueueDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -673,7 +707,8 @@ export namespace Prisma {
     Ingredient: 'Ingredient',
     Phrase: 'Phrase',
     Source: 'Source',
-    SourceImage: 'SourceImage'
+    SourceImage: 'SourceImage',
+    PublicationQueue: 'PublicationQueue'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -692,7 +727,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "category" | "tag" | "ingredient" | "phrase" | "source" | "sourceImage"
+      modelProps: "category" | "tag" | "ingredient" | "phrase" | "source" | "sourceImage" | "publicationQueue"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1092,6 +1127,72 @@ export namespace Prisma {
           }
         }
       }
+      PublicationQueue: {
+        payload: Prisma.$PublicationQueuePayload<ExtArgs>
+        fields: Prisma.PublicationQueueFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PublicationQueueFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PublicationQueueFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload>
+          }
+          findFirst: {
+            args: Prisma.PublicationQueueFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PublicationQueueFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload>
+          }
+          findMany: {
+            args: Prisma.PublicationQueueFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload>[]
+          }
+          create: {
+            args: Prisma.PublicationQueueCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload>
+          }
+          createMany: {
+            args: Prisma.PublicationQueueCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.PublicationQueueDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload>
+          }
+          update: {
+            args: Prisma.PublicationQueueUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload>
+          }
+          deleteMany: {
+            args: Prisma.PublicationQueueDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PublicationQueueUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PublicationQueueUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicationQueuePayload>
+          }
+          aggregate: {
+            args: Prisma.PublicationQueueAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePublicationQueue>
+          }
+          groupBy: {
+            args: Prisma.PublicationQueueGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PublicationQueueGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PublicationQueueCountArgs<ExtArgs>
+            result: $Utils.Optional<PublicationQueueCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1190,6 +1291,7 @@ export namespace Prisma {
     phrase?: PhraseOmit
     source?: SourceOmit
     sourceImage?: SourceImageOmit
+    publicationQueue?: PublicationQueueOmit
   }
 
   /* Types for Logging */
@@ -5173,6 +5275,7 @@ export namespace Prisma {
 
   export type SourceMinAggregateOutputType = {
     id: number | null
+    source: string | null
     recipeUrl: string | null
     recipeDate: Date | null
     htmlContent: string | null
@@ -5186,6 +5289,7 @@ export namespace Prisma {
 
   export type SourceMaxAggregateOutputType = {
     id: number | null
+    source: string | null
     recipeUrl: string | null
     recipeDate: Date | null
     htmlContent: string | null
@@ -5199,6 +5303,7 @@ export namespace Prisma {
 
   export type SourceCountAggregateOutputType = {
     id: number
+    source: number
     recipeUrl: number
     recipeDate: number
     htmlContent: number
@@ -5224,6 +5329,7 @@ export namespace Prisma {
 
   export type SourceMinAggregateInputType = {
     id?: true
+    source?: true
     recipeUrl?: true
     recipeDate?: true
     htmlContent?: true
@@ -5237,6 +5343,7 @@ export namespace Prisma {
 
   export type SourceMaxAggregateInputType = {
     id?: true
+    source?: true
     recipeUrl?: true
     recipeDate?: true
     htmlContent?: true
@@ -5250,6 +5357,7 @@ export namespace Prisma {
 
   export type SourceCountAggregateInputType = {
     id?: true
+    source?: true
     recipeUrl?: true
     recipeDate?: true
     htmlContent?: true
@@ -5352,6 +5460,7 @@ export namespace Prisma {
 
   export type SourceGroupByOutputType = {
     id: number
+    source: string | null
     recipeUrl: string
     recipeDate: Date | null
     htmlContent: string | null
@@ -5386,6 +5495,7 @@ export namespace Prisma {
 
   export type SourceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    source?: boolean
     recipeUrl?: boolean
     recipeDate?: boolean
     htmlContent?: boolean
@@ -5398,6 +5508,7 @@ export namespace Prisma {
     flagged?: boolean
     needsReview?: boolean
     sourceImages?: boolean | Source$sourceImagesArgs<ExtArgs>
+    publicationQueue?: boolean | Source$publicationQueueArgs<ExtArgs>
     _count?: boolean | SourceCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["source"]>
 
@@ -5405,6 +5516,7 @@ export namespace Prisma {
 
   export type SourceSelectScalar = {
     id?: boolean
+    source?: boolean
     recipeUrl?: boolean
     recipeDate?: boolean
     htmlContent?: boolean
@@ -5418,9 +5530,10 @@ export namespace Prisma {
     needsReview?: boolean
   }
 
-  export type SourceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "recipeUrl" | "recipeDate" | "htmlContent" | "jsonParsed" | "jsonAltered" | "version" | "createdAt" | "updatedAt" | "checked" | "flagged" | "needsReview", ExtArgs["result"]["source"]>
+  export type SourceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "source" | "recipeUrl" | "recipeDate" | "htmlContent" | "jsonParsed" | "jsonAltered" | "version" | "createdAt" | "updatedAt" | "checked" | "flagged" | "needsReview", ExtArgs["result"]["source"]>
   export type SourceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sourceImages?: boolean | Source$sourceImagesArgs<ExtArgs>
+    publicationQueue?: boolean | Source$publicationQueueArgs<ExtArgs>
     _count?: boolean | SourceCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -5428,9 +5541,11 @@ export namespace Prisma {
     name: "Source"
     objects: {
       sourceImages: Prisma.$SourceImagePayload<ExtArgs>[]
+      publicationQueue: Prisma.$PublicationQueuePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
+      source: string | null
       recipeUrl: string
       recipeDate: Date | null
       htmlContent: string | null
@@ -5783,6 +5898,7 @@ export namespace Prisma {
   export interface Prisma__SourceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     sourceImages<T extends Source$sourceImagesArgs<ExtArgs> = {}>(args?: Subset<T, Source$sourceImagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SourceImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    publicationQueue<T extends Source$publicationQueueArgs<ExtArgs> = {}>(args?: Subset<T, Source$publicationQueueArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5813,6 +5929,7 @@ export namespace Prisma {
    */
   interface SourceFieldRefs {
     readonly id: FieldRef<"Source", 'Int'>
+    readonly source: FieldRef<"Source", 'String'>
     readonly recipeUrl: FieldRef<"Source", 'String'>
     readonly recipeDate: FieldRef<"Source", 'DateTime'>
     readonly htmlContent: FieldRef<"Source", 'String'>
@@ -6188,6 +6305,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SourceImageScalarFieldEnum | SourceImageScalarFieldEnum[]
+  }
+
+  /**
+   * Source.publicationQueue
+   */
+  export type Source$publicationQueueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    where?: PublicationQueueWhereInput
   }
 
   /**
@@ -7255,6 +7391,962 @@ export namespace Prisma {
 
 
   /**
+   * Model PublicationQueue
+   */
+
+  export type AggregatePublicationQueue = {
+    _count: PublicationQueueCountAggregateOutputType | null
+    _avg: PublicationQueueAvgAggregateOutputType | null
+    _sum: PublicationQueueSumAggregateOutputType | null
+    _min: PublicationQueueMinAggregateOutputType | null
+    _max: PublicationQueueMaxAggregateOutputType | null
+  }
+
+  export type PublicationQueueAvgAggregateOutputType = {
+    id: number | null
+    sourceId: number | null
+  }
+
+  export type PublicationQueueSumAggregateOutputType = {
+    id: number | null
+    sourceId: number | null
+  }
+
+  export type PublicationQueueMinAggregateOutputType = {
+    id: number | null
+    sourceId: number | null
+    scheduledAt: Date | null
+    status: $Enums.PublicationStatus | null
+  }
+
+  export type PublicationQueueMaxAggregateOutputType = {
+    id: number | null
+    sourceId: number | null
+    scheduledAt: Date | null
+    status: $Enums.PublicationStatus | null
+  }
+
+  export type PublicationQueueCountAggregateOutputType = {
+    id: number
+    sourceId: number
+    scheduledAt: number
+    status: number
+    _all: number
+  }
+
+
+  export type PublicationQueueAvgAggregateInputType = {
+    id?: true
+    sourceId?: true
+  }
+
+  export type PublicationQueueSumAggregateInputType = {
+    id?: true
+    sourceId?: true
+  }
+
+  export type PublicationQueueMinAggregateInputType = {
+    id?: true
+    sourceId?: true
+    scheduledAt?: true
+    status?: true
+  }
+
+  export type PublicationQueueMaxAggregateInputType = {
+    id?: true
+    sourceId?: true
+    scheduledAt?: true
+    status?: true
+  }
+
+  export type PublicationQueueCountAggregateInputType = {
+    id?: true
+    sourceId?: true
+    scheduledAt?: true
+    status?: true
+    _all?: true
+  }
+
+  export type PublicationQueueAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicationQueue to aggregate.
+     */
+    where?: PublicationQueueWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicationQueues to fetch.
+     */
+    orderBy?: PublicationQueueOrderByWithRelationInput | PublicationQueueOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PublicationQueueWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicationQueues from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicationQueues.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PublicationQueues
+    **/
+    _count?: true | PublicationQueueCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PublicationQueueAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PublicationQueueSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PublicationQueueMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PublicationQueueMaxAggregateInputType
+  }
+
+  export type GetPublicationQueueAggregateType<T extends PublicationQueueAggregateArgs> = {
+        [P in keyof T & keyof AggregatePublicationQueue]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePublicationQueue[P]>
+      : GetScalarType<T[P], AggregatePublicationQueue[P]>
+  }
+
+
+
+
+  export type PublicationQueueGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicationQueueWhereInput
+    orderBy?: PublicationQueueOrderByWithAggregationInput | PublicationQueueOrderByWithAggregationInput[]
+    by: PublicationQueueScalarFieldEnum[] | PublicationQueueScalarFieldEnum
+    having?: PublicationQueueScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PublicationQueueCountAggregateInputType | true
+    _avg?: PublicationQueueAvgAggregateInputType
+    _sum?: PublicationQueueSumAggregateInputType
+    _min?: PublicationQueueMinAggregateInputType
+    _max?: PublicationQueueMaxAggregateInputType
+  }
+
+  export type PublicationQueueGroupByOutputType = {
+    id: number
+    sourceId: number
+    scheduledAt: Date
+    status: $Enums.PublicationStatus
+    _count: PublicationQueueCountAggregateOutputType | null
+    _avg: PublicationQueueAvgAggregateOutputType | null
+    _sum: PublicationQueueSumAggregateOutputType | null
+    _min: PublicationQueueMinAggregateOutputType | null
+    _max: PublicationQueueMaxAggregateOutputType | null
+  }
+
+  type GetPublicationQueueGroupByPayload<T extends PublicationQueueGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PublicationQueueGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PublicationQueueGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PublicationQueueGroupByOutputType[P]>
+            : GetScalarType<T[P], PublicationQueueGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PublicationQueueSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sourceId?: boolean
+    scheduledAt?: boolean
+    status?: boolean
+    source?: boolean | SourceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["publicationQueue"]>
+
+
+
+  export type PublicationQueueSelectScalar = {
+    id?: boolean
+    sourceId?: boolean
+    scheduledAt?: boolean
+    status?: boolean
+  }
+
+  export type PublicationQueueOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sourceId" | "scheduledAt" | "status", ExtArgs["result"]["publicationQueue"]>
+  export type PublicationQueueInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    source?: boolean | SourceDefaultArgs<ExtArgs>
+  }
+
+  export type $PublicationQueuePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PublicationQueue"
+    objects: {
+      source: Prisma.$SourcePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      sourceId: number
+      scheduledAt: Date
+      status: $Enums.PublicationStatus
+    }, ExtArgs["result"]["publicationQueue"]>
+    composites: {}
+  }
+
+  type PublicationQueueGetPayload<S extends boolean | null | undefined | PublicationQueueDefaultArgs> = $Result.GetResult<Prisma.$PublicationQueuePayload, S>
+
+  type PublicationQueueCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PublicationQueueFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PublicationQueueCountAggregateInputType | true
+    }
+
+  export interface PublicationQueueDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PublicationQueue'], meta: { name: 'PublicationQueue' } }
+    /**
+     * Find zero or one PublicationQueue that matches the filter.
+     * @param {PublicationQueueFindUniqueArgs} args - Arguments to find a PublicationQueue
+     * @example
+     * // Get one PublicationQueue
+     * const publicationQueue = await prisma.publicationQueue.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PublicationQueueFindUniqueArgs>(args: SelectSubset<T, PublicationQueueFindUniqueArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PublicationQueue that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PublicationQueueFindUniqueOrThrowArgs} args - Arguments to find a PublicationQueue
+     * @example
+     * // Get one PublicationQueue
+     * const publicationQueue = await prisma.publicationQueue.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PublicationQueueFindUniqueOrThrowArgs>(args: SelectSubset<T, PublicationQueueFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicationQueue that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationQueueFindFirstArgs} args - Arguments to find a PublicationQueue
+     * @example
+     * // Get one PublicationQueue
+     * const publicationQueue = await prisma.publicationQueue.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PublicationQueueFindFirstArgs>(args?: SelectSubset<T, PublicationQueueFindFirstArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicationQueue that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationQueueFindFirstOrThrowArgs} args - Arguments to find a PublicationQueue
+     * @example
+     * // Get one PublicationQueue
+     * const publicationQueue = await prisma.publicationQueue.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PublicationQueueFindFirstOrThrowArgs>(args?: SelectSubset<T, PublicationQueueFindFirstOrThrowArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PublicationQueues that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationQueueFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PublicationQueues
+     * const publicationQueues = await prisma.publicationQueue.findMany()
+     * 
+     * // Get first 10 PublicationQueues
+     * const publicationQueues = await prisma.publicationQueue.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const publicationQueueWithIdOnly = await prisma.publicationQueue.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PublicationQueueFindManyArgs>(args?: SelectSubset<T, PublicationQueueFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PublicationQueue.
+     * @param {PublicationQueueCreateArgs} args - Arguments to create a PublicationQueue.
+     * @example
+     * // Create one PublicationQueue
+     * const PublicationQueue = await prisma.publicationQueue.create({
+     *   data: {
+     *     // ... data to create a PublicationQueue
+     *   }
+     * })
+     * 
+     */
+    create<T extends PublicationQueueCreateArgs>(args: SelectSubset<T, PublicationQueueCreateArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PublicationQueues.
+     * @param {PublicationQueueCreateManyArgs} args - Arguments to create many PublicationQueues.
+     * @example
+     * // Create many PublicationQueues
+     * const publicationQueue = await prisma.publicationQueue.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PublicationQueueCreateManyArgs>(args?: SelectSubset<T, PublicationQueueCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a PublicationQueue.
+     * @param {PublicationQueueDeleteArgs} args - Arguments to delete one PublicationQueue.
+     * @example
+     * // Delete one PublicationQueue
+     * const PublicationQueue = await prisma.publicationQueue.delete({
+     *   where: {
+     *     // ... filter to delete one PublicationQueue
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PublicationQueueDeleteArgs>(args: SelectSubset<T, PublicationQueueDeleteArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PublicationQueue.
+     * @param {PublicationQueueUpdateArgs} args - Arguments to update one PublicationQueue.
+     * @example
+     * // Update one PublicationQueue
+     * const publicationQueue = await prisma.publicationQueue.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PublicationQueueUpdateArgs>(args: SelectSubset<T, PublicationQueueUpdateArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PublicationQueues.
+     * @param {PublicationQueueDeleteManyArgs} args - Arguments to filter PublicationQueues to delete.
+     * @example
+     * // Delete a few PublicationQueues
+     * const { count } = await prisma.publicationQueue.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PublicationQueueDeleteManyArgs>(args?: SelectSubset<T, PublicationQueueDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublicationQueues.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationQueueUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PublicationQueues
+     * const publicationQueue = await prisma.publicationQueue.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PublicationQueueUpdateManyArgs>(args: SelectSubset<T, PublicationQueueUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one PublicationQueue.
+     * @param {PublicationQueueUpsertArgs} args - Arguments to update or create a PublicationQueue.
+     * @example
+     * // Update or create a PublicationQueue
+     * const publicationQueue = await prisma.publicationQueue.upsert({
+     *   create: {
+     *     // ... data to create a PublicationQueue
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PublicationQueue we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PublicationQueueUpsertArgs>(args: SelectSubset<T, PublicationQueueUpsertArgs<ExtArgs>>): Prisma__PublicationQueueClient<$Result.GetResult<Prisma.$PublicationQueuePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PublicationQueues.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationQueueCountArgs} args - Arguments to filter PublicationQueues to count.
+     * @example
+     * // Count the number of PublicationQueues
+     * const count = await prisma.publicationQueue.count({
+     *   where: {
+     *     // ... the filter for the PublicationQueues we want to count
+     *   }
+     * })
+    **/
+    count<T extends PublicationQueueCountArgs>(
+      args?: Subset<T, PublicationQueueCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PublicationQueueCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PublicationQueue.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationQueueAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PublicationQueueAggregateArgs>(args: Subset<T, PublicationQueueAggregateArgs>): Prisma.PrismaPromise<GetPublicationQueueAggregateType<T>>
+
+    /**
+     * Group by PublicationQueue.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicationQueueGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PublicationQueueGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PublicationQueueGroupByArgs['orderBy'] }
+        : { orderBy?: PublicationQueueGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PublicationQueueGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPublicationQueueGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PublicationQueue model
+   */
+  readonly fields: PublicationQueueFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PublicationQueue.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PublicationQueueClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    source<T extends SourceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SourceDefaultArgs<ExtArgs>>): Prisma__SourceClient<$Result.GetResult<Prisma.$SourcePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PublicationQueue model
+   */
+  interface PublicationQueueFieldRefs {
+    readonly id: FieldRef<"PublicationQueue", 'Int'>
+    readonly sourceId: FieldRef<"PublicationQueue", 'Int'>
+    readonly scheduledAt: FieldRef<"PublicationQueue", 'DateTime'>
+    readonly status: FieldRef<"PublicationQueue", 'PublicationStatus'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PublicationQueue findUnique
+   */
+  export type PublicationQueueFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicationQueue to fetch.
+     */
+    where: PublicationQueueWhereUniqueInput
+  }
+
+  /**
+   * PublicationQueue findUniqueOrThrow
+   */
+  export type PublicationQueueFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicationQueue to fetch.
+     */
+    where: PublicationQueueWhereUniqueInput
+  }
+
+  /**
+   * PublicationQueue findFirst
+   */
+  export type PublicationQueueFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicationQueue to fetch.
+     */
+    where?: PublicationQueueWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicationQueues to fetch.
+     */
+    orderBy?: PublicationQueueOrderByWithRelationInput | PublicationQueueOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicationQueues.
+     */
+    cursor?: PublicationQueueWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicationQueues from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicationQueues.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicationQueues.
+     */
+    distinct?: PublicationQueueScalarFieldEnum | PublicationQueueScalarFieldEnum[]
+  }
+
+  /**
+   * PublicationQueue findFirstOrThrow
+   */
+  export type PublicationQueueFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicationQueue to fetch.
+     */
+    where?: PublicationQueueWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicationQueues to fetch.
+     */
+    orderBy?: PublicationQueueOrderByWithRelationInput | PublicationQueueOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicationQueues.
+     */
+    cursor?: PublicationQueueWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicationQueues from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicationQueues.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicationQueues.
+     */
+    distinct?: PublicationQueueScalarFieldEnum | PublicationQueueScalarFieldEnum[]
+  }
+
+  /**
+   * PublicationQueue findMany
+   */
+  export type PublicationQueueFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicationQueues to fetch.
+     */
+    where?: PublicationQueueWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicationQueues to fetch.
+     */
+    orderBy?: PublicationQueueOrderByWithRelationInput | PublicationQueueOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PublicationQueues.
+     */
+    cursor?: PublicationQueueWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicationQueues from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicationQueues.
+     */
+    skip?: number
+    distinct?: PublicationQueueScalarFieldEnum | PublicationQueueScalarFieldEnum[]
+  }
+
+  /**
+   * PublicationQueue create
+   */
+  export type PublicationQueueCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PublicationQueue.
+     */
+    data: XOR<PublicationQueueCreateInput, PublicationQueueUncheckedCreateInput>
+  }
+
+  /**
+   * PublicationQueue createMany
+   */
+  export type PublicationQueueCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PublicationQueues.
+     */
+    data: PublicationQueueCreateManyInput | PublicationQueueCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PublicationQueue update
+   */
+  export type PublicationQueueUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PublicationQueue.
+     */
+    data: XOR<PublicationQueueUpdateInput, PublicationQueueUncheckedUpdateInput>
+    /**
+     * Choose, which PublicationQueue to update.
+     */
+    where: PublicationQueueWhereUniqueInput
+  }
+
+  /**
+   * PublicationQueue updateMany
+   */
+  export type PublicationQueueUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PublicationQueues.
+     */
+    data: XOR<PublicationQueueUpdateManyMutationInput, PublicationQueueUncheckedUpdateManyInput>
+    /**
+     * Filter which PublicationQueues to update
+     */
+    where?: PublicationQueueWhereInput
+    /**
+     * Limit how many PublicationQueues to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicationQueue upsert
+   */
+  export type PublicationQueueUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PublicationQueue to update in case it exists.
+     */
+    where: PublicationQueueWhereUniqueInput
+    /**
+     * In case the PublicationQueue found by the `where` argument doesn't exist, create a new PublicationQueue with this data.
+     */
+    create: XOR<PublicationQueueCreateInput, PublicationQueueUncheckedCreateInput>
+    /**
+     * In case the PublicationQueue was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PublicationQueueUpdateInput, PublicationQueueUncheckedUpdateInput>
+  }
+
+  /**
+   * PublicationQueue delete
+   */
+  export type PublicationQueueDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+    /**
+     * Filter which PublicationQueue to delete.
+     */
+    where: PublicationQueueWhereUniqueInput
+  }
+
+  /**
+   * PublicationQueue deleteMany
+   */
+  export type PublicationQueueDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicationQueues to delete
+     */
+    where?: PublicationQueueWhereInput
+    /**
+     * Limit how many PublicationQueues to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicationQueue without action
+   */
+  export type PublicationQueueDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicationQueue
+     */
+    select?: PublicationQueueSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicationQueue
+     */
+    omit?: PublicationQueueOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicationQueueInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -7317,6 +8409,7 @@ export namespace Prisma {
 
   export const SourceScalarFieldEnum: {
     id: 'id',
+    source: 'source',
     recipeUrl: 'recipeUrl',
     recipeDate: 'recipeDate',
     htmlContent: 'htmlContent',
@@ -7347,6 +8440,16 @@ export namespace Prisma {
   };
 
   export type SourceImageScalarFieldEnum = (typeof SourceImageScalarFieldEnum)[keyof typeof SourceImageScalarFieldEnum]
+
+
+  export const PublicationQueueScalarFieldEnum: {
+    id: 'id',
+    sourceId: 'sourceId',
+    scheduledAt: 'scheduledAt',
+    status: 'status'
+  };
+
+  export type PublicationQueueScalarFieldEnum = (typeof PublicationQueueScalarFieldEnum)[keyof typeof PublicationQueueScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -7425,6 +8528,7 @@ export namespace Prisma {
 
 
   export const SourceOrderByRelevanceFieldEnum: {
+    source: 'source',
     recipeUrl: 'recipeUrl',
     htmlContent: 'htmlContent',
     version: 'version',
@@ -7494,6 +8598,13 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'PublicationStatus'
+   */
+  export type EnumPublicationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PublicationStatus'>
     
 
 
@@ -7755,6 +8866,7 @@ export namespace Prisma {
     OR?: SourceWhereInput[]
     NOT?: SourceWhereInput | SourceWhereInput[]
     id?: IntFilter<"Source"> | number
+    source?: StringNullableFilter<"Source"> | string | null
     recipeUrl?: StringFilter<"Source"> | string
     recipeDate?: DateTimeNullableFilter<"Source"> | Date | string | null
     htmlContent?: StringNullableFilter<"Source"> | string | null
@@ -7767,10 +8879,12 @@ export namespace Prisma {
     flagged?: BoolFilter<"Source"> | boolean
     needsReview?: StringNullableFilter<"Source"> | string | null
     sourceImages?: SourceImageListRelationFilter
+    publicationQueue?: XOR<PublicationQueueNullableScalarRelationFilter, PublicationQueueWhereInput> | null
   }
 
   export type SourceOrderByWithRelationInput = {
     id?: SortOrder
+    source?: SortOrderInput | SortOrder
     recipeUrl?: SortOrder
     recipeDate?: SortOrderInput | SortOrder
     htmlContent?: SortOrderInput | SortOrder
@@ -7783,6 +8897,7 @@ export namespace Prisma {
     flagged?: SortOrder
     needsReview?: SortOrderInput | SortOrder
     sourceImages?: SourceImageOrderByRelationAggregateInput
+    publicationQueue?: PublicationQueueOrderByWithRelationInput
     _relevance?: SourceOrderByRelevanceInput
   }
 
@@ -7792,6 +8907,7 @@ export namespace Prisma {
     AND?: SourceWhereInput | SourceWhereInput[]
     OR?: SourceWhereInput[]
     NOT?: SourceWhereInput | SourceWhereInput[]
+    source?: StringNullableFilter<"Source"> | string | null
     recipeDate?: DateTimeNullableFilter<"Source"> | Date | string | null
     htmlContent?: StringNullableFilter<"Source"> | string | null
     jsonParsed?: JsonNullableFilter<"Source">
@@ -7803,10 +8919,12 @@ export namespace Prisma {
     flagged?: BoolFilter<"Source"> | boolean
     needsReview?: StringNullableFilter<"Source"> | string | null
     sourceImages?: SourceImageListRelationFilter
+    publicationQueue?: XOR<PublicationQueueNullableScalarRelationFilter, PublicationQueueWhereInput> | null
   }, "id" | "recipeUrl">
 
   export type SourceOrderByWithAggregationInput = {
     id?: SortOrder
+    source?: SortOrderInput | SortOrder
     recipeUrl?: SortOrder
     recipeDate?: SortOrderInput | SortOrder
     htmlContent?: SortOrderInput | SortOrder
@@ -7830,6 +8948,7 @@ export namespace Prisma {
     OR?: SourceScalarWhereWithAggregatesInput[]
     NOT?: SourceScalarWhereWithAggregatesInput | SourceScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Source"> | number
+    source?: StringNullableWithAggregatesFilter<"Source"> | string | null
     recipeUrl?: StringWithAggregatesFilter<"Source"> | string
     recipeDate?: DateTimeNullableWithAggregatesFilter<"Source"> | Date | string | null
     htmlContent?: StringNullableWithAggregatesFilter<"Source"> | string | null
@@ -7925,6 +9044,58 @@ export namespace Prisma {
     downloaded?: BoolWithAggregatesFilter<"SourceImage"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"SourceImage"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SourceImage"> | Date | string
+  }
+
+  export type PublicationQueueWhereInput = {
+    AND?: PublicationQueueWhereInput | PublicationQueueWhereInput[]
+    OR?: PublicationQueueWhereInput[]
+    NOT?: PublicationQueueWhereInput | PublicationQueueWhereInput[]
+    id?: IntFilter<"PublicationQueue"> | number
+    sourceId?: IntFilter<"PublicationQueue"> | number
+    scheduledAt?: DateTimeFilter<"PublicationQueue"> | Date | string
+    status?: EnumPublicationStatusFilter<"PublicationQueue"> | $Enums.PublicationStatus
+    source?: XOR<SourceScalarRelationFilter, SourceWhereInput>
+  }
+
+  export type PublicationQueueOrderByWithRelationInput = {
+    id?: SortOrder
+    sourceId?: SortOrder
+    scheduledAt?: SortOrder
+    status?: SortOrder
+    source?: SourceOrderByWithRelationInput
+  }
+
+  export type PublicationQueueWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    sourceId?: number
+    AND?: PublicationQueueWhereInput | PublicationQueueWhereInput[]
+    OR?: PublicationQueueWhereInput[]
+    NOT?: PublicationQueueWhereInput | PublicationQueueWhereInput[]
+    scheduledAt?: DateTimeFilter<"PublicationQueue"> | Date | string
+    status?: EnumPublicationStatusFilter<"PublicationQueue"> | $Enums.PublicationStatus
+    source?: XOR<SourceScalarRelationFilter, SourceWhereInput>
+  }, "id" | "sourceId">
+
+  export type PublicationQueueOrderByWithAggregationInput = {
+    id?: SortOrder
+    sourceId?: SortOrder
+    scheduledAt?: SortOrder
+    status?: SortOrder
+    _count?: PublicationQueueCountOrderByAggregateInput
+    _avg?: PublicationQueueAvgOrderByAggregateInput
+    _max?: PublicationQueueMaxOrderByAggregateInput
+    _min?: PublicationQueueMinOrderByAggregateInput
+    _sum?: PublicationQueueSumOrderByAggregateInput
+  }
+
+  export type PublicationQueueScalarWhereWithAggregatesInput = {
+    AND?: PublicationQueueScalarWhereWithAggregatesInput | PublicationQueueScalarWhereWithAggregatesInput[]
+    OR?: PublicationQueueScalarWhereWithAggregatesInput[]
+    NOT?: PublicationQueueScalarWhereWithAggregatesInput | PublicationQueueScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"PublicationQueue"> | number
+    sourceId?: IntWithAggregatesFilter<"PublicationQueue"> | number
+    scheduledAt?: DateTimeWithAggregatesFilter<"PublicationQueue"> | Date | string
+    status?: EnumPublicationStatusWithAggregatesFilter<"PublicationQueue"> | $Enums.PublicationStatus
   }
 
   export type CategoryCreateInput = {
@@ -8170,6 +9341,7 @@ export namespace Prisma {
   }
 
   export type SourceCreateInput = {
+    source?: string | null
     recipeUrl: string
     recipeDate?: Date | string | null
     htmlContent?: string | null
@@ -8182,10 +9354,12 @@ export namespace Prisma {
     flagged?: boolean
     needsReview?: string | null
     sourceImages?: SourceImageCreateNestedManyWithoutSourceInput
+    publicationQueue?: PublicationQueueCreateNestedOneWithoutSourceInput
   }
 
   export type SourceUncheckedCreateInput = {
     id?: number
+    source?: string | null
     recipeUrl: string
     recipeDate?: Date | string | null
     htmlContent?: string | null
@@ -8198,9 +9372,11 @@ export namespace Prisma {
     flagged?: boolean
     needsReview?: string | null
     sourceImages?: SourceImageUncheckedCreateNestedManyWithoutSourceInput
+    publicationQueue?: PublicationQueueUncheckedCreateNestedOneWithoutSourceInput
   }
 
   export type SourceUpdateInput = {
+    source?: NullableStringFieldUpdateOperationsInput | string | null
     recipeUrl?: StringFieldUpdateOperationsInput | string
     recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8213,10 +9389,12 @@ export namespace Prisma {
     flagged?: BoolFieldUpdateOperationsInput | boolean
     needsReview?: NullableStringFieldUpdateOperationsInput | string | null
     sourceImages?: SourceImageUpdateManyWithoutSourceNestedInput
+    publicationQueue?: PublicationQueueUpdateOneWithoutSourceNestedInput
   }
 
   export type SourceUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
+    source?: NullableStringFieldUpdateOperationsInput | string | null
     recipeUrl?: StringFieldUpdateOperationsInput | string
     recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8229,10 +9407,12 @@ export namespace Prisma {
     flagged?: BoolFieldUpdateOperationsInput | boolean
     needsReview?: NullableStringFieldUpdateOperationsInput | string | null
     sourceImages?: SourceImageUncheckedUpdateManyWithoutSourceNestedInput
+    publicationQueue?: PublicationQueueUncheckedUpdateOneWithoutSourceNestedInput
   }
 
   export type SourceCreateManyInput = {
     id?: number
+    source?: string | null
     recipeUrl: string
     recipeDate?: Date | string | null
     htmlContent?: string | null
@@ -8247,6 +9427,7 @@ export namespace Prisma {
   }
 
   export type SourceUpdateManyMutationInput = {
+    source?: NullableStringFieldUpdateOperationsInput | string | null
     recipeUrl?: StringFieldUpdateOperationsInput | string
     recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8262,6 +9443,7 @@ export namespace Prisma {
 
   export type SourceUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
+    source?: NullableStringFieldUpdateOperationsInput | string | null
     recipeUrl?: StringFieldUpdateOperationsInput | string
     recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8360,6 +9542,51 @@ export namespace Prisma {
     downloaded?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicationQueueCreateInput = {
+    scheduledAt: Date | string
+    status?: $Enums.PublicationStatus
+    source: SourceCreateNestedOneWithoutPublicationQueueInput
+  }
+
+  export type PublicationQueueUncheckedCreateInput = {
+    id?: number
+    sourceId: number
+    scheduledAt: Date | string
+    status?: $Enums.PublicationStatus
+  }
+
+  export type PublicationQueueUpdateInput = {
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+    source?: SourceUpdateOneRequiredWithoutPublicationQueueNestedInput
+  }
+
+  export type PublicationQueueUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+  }
+
+  export type PublicationQueueCreateManyInput = {
+    id?: number
+    sourceId: number
+    scheduledAt: Date | string
+    status?: $Enums.PublicationStatus
+  }
+
+  export type PublicationQueueUpdateManyMutationInput = {
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+  }
+
+  export type PublicationQueueUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -8747,17 +9974,6 @@ export namespace Prisma {
     index?: SortOrder
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -8773,6 +9989,17 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -8782,6 +10009,11 @@ export namespace Prisma {
     every?: SourceImageWhereInput
     some?: SourceImageWhereInput
     none?: SourceImageWhereInput
+  }
+
+  export type PublicationQueueNullableScalarRelationFilter = {
+    is?: PublicationQueueWhereInput | null
+    isNot?: PublicationQueueWhereInput | null
   }
 
   export type SourceImageOrderByRelationAggregateInput = {
@@ -8796,6 +10028,7 @@ export namespace Prisma {
 
   export type SourceCountOrderByAggregateInput = {
     id?: SortOrder
+    source?: SortOrder
     recipeUrl?: SortOrder
     recipeDate?: SortOrder
     htmlContent?: SortOrder
@@ -8815,6 +10048,7 @@ export namespace Prisma {
 
   export type SourceMaxOrderByAggregateInput = {
     id?: SortOrder
+    source?: SortOrder
     recipeUrl?: SortOrder
     recipeDate?: SortOrder
     htmlContent?: SortOrder
@@ -8828,6 +10062,7 @@ export namespace Prisma {
 
   export type SourceMinOrderByAggregateInput = {
     id?: SortOrder
+    source?: SortOrder
     recipeUrl?: SortOrder
     recipeDate?: SortOrder
     htmlContent?: SortOrder
@@ -8841,20 +10076,6 @@ export namespace Prisma {
 
   export type SourceSumOrderByAggregateInput = {
     id?: SortOrder
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -8873,6 +10094,20 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -8948,6 +10183,59 @@ export namespace Prisma {
     id?: SortOrder
     sourceId?: SortOrder
     order?: SortOrder
+  }
+
+  export type EnumPublicationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PublicationStatus | EnumPublicationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PublicationStatus[]
+    notIn?: $Enums.PublicationStatus[]
+    not?: NestedEnumPublicationStatusFilter<$PrismaModel> | $Enums.PublicationStatus
+  }
+
+  export type SourceScalarRelationFilter = {
+    is?: SourceWhereInput
+    isNot?: SourceWhereInput
+  }
+
+  export type PublicationQueueCountOrderByAggregateInput = {
+    id?: SortOrder
+    sourceId?: SortOrder
+    scheduledAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type PublicationQueueAvgOrderByAggregateInput = {
+    id?: SortOrder
+    sourceId?: SortOrder
+  }
+
+  export type PublicationQueueMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sourceId?: SortOrder
+    scheduledAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type PublicationQueueMinOrderByAggregateInput = {
+    id?: SortOrder
+    sourceId?: SortOrder
+    scheduledAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type PublicationQueueSumOrderByAggregateInput = {
+    id?: SortOrder
+    sourceId?: SortOrder
+  }
+
+  export type EnumPublicationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PublicationStatus | EnumPublicationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PublicationStatus[]
+    notIn?: $Enums.PublicationStatus[]
+    not?: NestedEnumPublicationStatusWithAggregatesFilter<$PrismaModel> | $Enums.PublicationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPublicationStatusFilter<$PrismaModel>
+    _max?: NestedEnumPublicationStatusFilter<$PrismaModel>
   }
 
   export type CategoryCreateNestedOneWithoutChildrenInput = {
@@ -9047,6 +10335,12 @@ export namespace Prisma {
     connect?: SourceImageWhereUniqueInput | SourceImageWhereUniqueInput[]
   }
 
+  export type PublicationQueueCreateNestedOneWithoutSourceInput = {
+    create?: XOR<PublicationQueueCreateWithoutSourceInput, PublicationQueueUncheckedCreateWithoutSourceInput>
+    connectOrCreate?: PublicationQueueCreateOrConnectWithoutSourceInput
+    connect?: PublicationQueueWhereUniqueInput
+  }
+
   export type SourceImageUncheckedCreateNestedManyWithoutSourceInput = {
     create?: XOR<SourceImageCreateWithoutSourceInput, SourceImageUncheckedCreateWithoutSourceInput> | SourceImageCreateWithoutSourceInput[] | SourceImageUncheckedCreateWithoutSourceInput[]
     connectOrCreate?: SourceImageCreateOrConnectWithoutSourceInput | SourceImageCreateOrConnectWithoutSourceInput[]
@@ -9054,12 +10348,18 @@ export namespace Prisma {
     connect?: SourceImageWhereUniqueInput | SourceImageWhereUniqueInput[]
   }
 
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
+  export type PublicationQueueUncheckedCreateNestedOneWithoutSourceInput = {
+    create?: XOR<PublicationQueueCreateWithoutSourceInput, PublicationQueueUncheckedCreateWithoutSourceInput>
+    connectOrCreate?: PublicationQueueCreateOrConnectWithoutSourceInput
+    connect?: PublicationQueueWhereUniqueInput
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -9080,6 +10380,16 @@ export namespace Prisma {
     deleteMany?: SourceImageScalarWhereInput | SourceImageScalarWhereInput[]
   }
 
+  export type PublicationQueueUpdateOneWithoutSourceNestedInput = {
+    create?: XOR<PublicationQueueCreateWithoutSourceInput, PublicationQueueUncheckedCreateWithoutSourceInput>
+    connectOrCreate?: PublicationQueueCreateOrConnectWithoutSourceInput
+    upsert?: PublicationQueueUpsertWithoutSourceInput
+    disconnect?: PublicationQueueWhereInput | boolean
+    delete?: PublicationQueueWhereInput | boolean
+    connect?: PublicationQueueWhereUniqueInput
+    update?: XOR<XOR<PublicationQueueUpdateToOneWithWhereWithoutSourceInput, PublicationQueueUpdateWithoutSourceInput>, PublicationQueueUncheckedUpdateWithoutSourceInput>
+  }
+
   export type SourceImageUncheckedUpdateManyWithoutSourceNestedInput = {
     create?: XOR<SourceImageCreateWithoutSourceInput, SourceImageUncheckedCreateWithoutSourceInput> | SourceImageCreateWithoutSourceInput[] | SourceImageUncheckedCreateWithoutSourceInput[]
     connectOrCreate?: SourceImageCreateOrConnectWithoutSourceInput | SourceImageCreateOrConnectWithoutSourceInput[]
@@ -9092,6 +10402,16 @@ export namespace Prisma {
     update?: SourceImageUpdateWithWhereUniqueWithoutSourceInput | SourceImageUpdateWithWhereUniqueWithoutSourceInput[]
     updateMany?: SourceImageUpdateManyWithWhereWithoutSourceInput | SourceImageUpdateManyWithWhereWithoutSourceInput[]
     deleteMany?: SourceImageScalarWhereInput | SourceImageScalarWhereInput[]
+  }
+
+  export type PublicationQueueUncheckedUpdateOneWithoutSourceNestedInput = {
+    create?: XOR<PublicationQueueCreateWithoutSourceInput, PublicationQueueUncheckedCreateWithoutSourceInput>
+    connectOrCreate?: PublicationQueueCreateOrConnectWithoutSourceInput
+    upsert?: PublicationQueueUpsertWithoutSourceInput
+    disconnect?: PublicationQueueWhereInput | boolean
+    delete?: PublicationQueueWhereInput | boolean
+    connect?: PublicationQueueWhereUniqueInput
+    update?: XOR<XOR<PublicationQueueUpdateToOneWithWhereWithoutSourceInput, PublicationQueueUpdateWithoutSourceInput>, PublicationQueueUncheckedUpdateWithoutSourceInput>
   }
 
   export type SourceCreateNestedOneWithoutSourceImagesInput = {
@@ -9108,6 +10428,24 @@ export namespace Prisma {
     delete?: SourceWhereInput | boolean
     connect?: SourceWhereUniqueInput
     update?: XOR<XOR<SourceUpdateToOneWithWhereWithoutSourceImagesInput, SourceUpdateWithoutSourceImagesInput>, SourceUncheckedUpdateWithoutSourceImagesInput>
+  }
+
+  export type SourceCreateNestedOneWithoutPublicationQueueInput = {
+    create?: XOR<SourceCreateWithoutPublicationQueueInput, SourceUncheckedCreateWithoutPublicationQueueInput>
+    connectOrCreate?: SourceCreateOrConnectWithoutPublicationQueueInput
+    connect?: SourceWhereUniqueInput
+  }
+
+  export type EnumPublicationStatusFieldUpdateOperationsInput = {
+    set?: $Enums.PublicationStatus
+  }
+
+  export type SourceUpdateOneRequiredWithoutPublicationQueueNestedInput = {
+    create?: XOR<SourceCreateWithoutPublicationQueueInput, SourceUncheckedCreateWithoutPublicationQueueInput>
+    connectOrCreate?: SourceCreateOrConnectWithoutPublicationQueueInput
+    upsert?: SourceUpsertWithoutPublicationQueueInput
+    connect?: SourceWhereUniqueInput
+    update?: XOR<XOR<SourceUpdateToOneWithWhereWithoutPublicationQueueInput, SourceUpdateWithoutPublicationQueueInput>, SourceUncheckedUpdateWithoutPublicationQueueInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -9294,17 +10632,6 @@ export namespace Prisma {
     _max?: NestedBigIntFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -9320,12 +10647,7 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | null
     notIn?: Date[] | string[] | null
@@ -9333,10 +10655,12 @@ export namespace Prisma {
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -9357,12 +10681,43 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPublicationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PublicationStatus | EnumPublicationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PublicationStatus[]
+    notIn?: $Enums.PublicationStatus[]
+    not?: NestedEnumPublicationStatusFilter<$PrismaModel> | $Enums.PublicationStatus
+  }
+
+  export type NestedEnumPublicationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PublicationStatus | EnumPublicationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PublicationStatus[]
+    notIn?: $Enums.PublicationStatus[]
+    not?: NestedEnumPublicationStatusWithAggregatesFilter<$PrismaModel> | $Enums.PublicationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPublicationStatusFilter<$PrismaModel>
+    _max?: NestedEnumPublicationStatusFilter<$PrismaModel>
   }
 
   export type CategoryCreateWithoutChildrenInput = {
@@ -9503,6 +10858,22 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PublicationQueueCreateWithoutSourceInput = {
+    scheduledAt: Date | string
+    status?: $Enums.PublicationStatus
+  }
+
+  export type PublicationQueueUncheckedCreateWithoutSourceInput = {
+    id?: number
+    scheduledAt: Date | string
+    status?: $Enums.PublicationStatus
+  }
+
+  export type PublicationQueueCreateOrConnectWithoutSourceInput = {
+    where: PublicationQueueWhereUniqueInput
+    create: XOR<PublicationQueueCreateWithoutSourceInput, PublicationQueueUncheckedCreateWithoutSourceInput>
+  }
+
   export type SourceImageUpsertWithWhereUniqueWithoutSourceInput = {
     where: SourceImageWhereUniqueInput
     update: XOR<SourceImageUpdateWithoutSourceInput, SourceImageUncheckedUpdateWithoutSourceInput>
@@ -9535,7 +10906,30 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"SourceImage"> | Date | string
   }
 
+  export type PublicationQueueUpsertWithoutSourceInput = {
+    update: XOR<PublicationQueueUpdateWithoutSourceInput, PublicationQueueUncheckedUpdateWithoutSourceInput>
+    create: XOR<PublicationQueueCreateWithoutSourceInput, PublicationQueueUncheckedCreateWithoutSourceInput>
+    where?: PublicationQueueWhereInput
+  }
+
+  export type PublicationQueueUpdateToOneWithWhereWithoutSourceInput = {
+    where?: PublicationQueueWhereInput
+    data: XOR<PublicationQueueUpdateWithoutSourceInput, PublicationQueueUncheckedUpdateWithoutSourceInput>
+  }
+
+  export type PublicationQueueUpdateWithoutSourceInput = {
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+  }
+
+  export type PublicationQueueUncheckedUpdateWithoutSourceInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+  }
+
   export type SourceCreateWithoutSourceImagesInput = {
+    source?: string | null
     recipeUrl: string
     recipeDate?: Date | string | null
     htmlContent?: string | null
@@ -9547,10 +10941,12 @@ export namespace Prisma {
     checked?: boolean
     flagged?: boolean
     needsReview?: string | null
+    publicationQueue?: PublicationQueueCreateNestedOneWithoutSourceInput
   }
 
   export type SourceUncheckedCreateWithoutSourceImagesInput = {
     id?: number
+    source?: string | null
     recipeUrl: string
     recipeDate?: Date | string | null
     htmlContent?: string | null
@@ -9562,6 +10958,7 @@ export namespace Prisma {
     checked?: boolean
     flagged?: boolean
     needsReview?: string | null
+    publicationQueue?: PublicationQueueUncheckedCreateNestedOneWithoutSourceInput
   }
 
   export type SourceCreateOrConnectWithoutSourceImagesInput = {
@@ -9581,6 +10978,7 @@ export namespace Prisma {
   }
 
   export type SourceUpdateWithoutSourceImagesInput = {
+    source?: NullableStringFieldUpdateOperationsInput | string | null
     recipeUrl?: StringFieldUpdateOperationsInput | string
     recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9592,10 +10990,12 @@ export namespace Prisma {
     checked?: BoolFieldUpdateOperationsInput | boolean
     flagged?: BoolFieldUpdateOperationsInput | boolean
     needsReview?: NullableStringFieldUpdateOperationsInput | string | null
+    publicationQueue?: PublicationQueueUpdateOneWithoutSourceNestedInput
   }
 
   export type SourceUncheckedUpdateWithoutSourceImagesInput = {
     id?: IntFieldUpdateOperationsInput | number
+    source?: NullableStringFieldUpdateOperationsInput | string | null
     recipeUrl?: StringFieldUpdateOperationsInput | string
     recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9607,6 +11007,89 @@ export namespace Prisma {
     checked?: BoolFieldUpdateOperationsInput | boolean
     flagged?: BoolFieldUpdateOperationsInput | boolean
     needsReview?: NullableStringFieldUpdateOperationsInput | string | null
+    publicationQueue?: PublicationQueueUncheckedUpdateOneWithoutSourceNestedInput
+  }
+
+  export type SourceCreateWithoutPublicationQueueInput = {
+    source?: string | null
+    recipeUrl: string
+    recipeDate?: Date | string | null
+    htmlContent?: string | null
+    jsonParsed?: NullableJsonNullValueInput | InputJsonValue
+    jsonAltered?: NullableJsonNullValueInput | InputJsonValue
+    version?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    checked?: boolean
+    flagged?: boolean
+    needsReview?: string | null
+    sourceImages?: SourceImageCreateNestedManyWithoutSourceInput
+  }
+
+  export type SourceUncheckedCreateWithoutPublicationQueueInput = {
+    id?: number
+    source?: string | null
+    recipeUrl: string
+    recipeDate?: Date | string | null
+    htmlContent?: string | null
+    jsonParsed?: NullableJsonNullValueInput | InputJsonValue
+    jsonAltered?: NullableJsonNullValueInput | InputJsonValue
+    version?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    checked?: boolean
+    flagged?: boolean
+    needsReview?: string | null
+    sourceImages?: SourceImageUncheckedCreateNestedManyWithoutSourceInput
+  }
+
+  export type SourceCreateOrConnectWithoutPublicationQueueInput = {
+    where: SourceWhereUniqueInput
+    create: XOR<SourceCreateWithoutPublicationQueueInput, SourceUncheckedCreateWithoutPublicationQueueInput>
+  }
+
+  export type SourceUpsertWithoutPublicationQueueInput = {
+    update: XOR<SourceUpdateWithoutPublicationQueueInput, SourceUncheckedUpdateWithoutPublicationQueueInput>
+    create: XOR<SourceCreateWithoutPublicationQueueInput, SourceUncheckedCreateWithoutPublicationQueueInput>
+    where?: SourceWhereInput
+  }
+
+  export type SourceUpdateToOneWithWhereWithoutPublicationQueueInput = {
+    where?: SourceWhereInput
+    data: XOR<SourceUpdateWithoutPublicationQueueInput, SourceUncheckedUpdateWithoutPublicationQueueInput>
+  }
+
+  export type SourceUpdateWithoutPublicationQueueInput = {
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    recipeUrl?: StringFieldUpdateOperationsInput | string
+    recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
+    jsonParsed?: NullableJsonNullValueInput | InputJsonValue
+    jsonAltered?: NullableJsonNullValueInput | InputJsonValue
+    version?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    checked?: BoolFieldUpdateOperationsInput | boolean
+    flagged?: BoolFieldUpdateOperationsInput | boolean
+    needsReview?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceImages?: SourceImageUpdateManyWithoutSourceNestedInput
+  }
+
+  export type SourceUncheckedUpdateWithoutPublicationQueueInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    recipeUrl?: StringFieldUpdateOperationsInput | string
+    recipeDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    htmlContent?: NullableStringFieldUpdateOperationsInput | string | null
+    jsonParsed?: NullableJsonNullValueInput | InputJsonValue
+    jsonAltered?: NullableJsonNullValueInput | InputJsonValue
+    version?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    checked?: BoolFieldUpdateOperationsInput | boolean
+    flagged?: BoolFieldUpdateOperationsInput | boolean
+    needsReview?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceImages?: SourceImageUncheckedUpdateManyWithoutSourceNestedInput
   }
 
   export type CategoryCreateManyParentInput = {

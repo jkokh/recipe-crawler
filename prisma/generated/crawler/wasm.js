@@ -157,6 +157,7 @@ exports.Prisma.PhraseScalarFieldEnum = {
 
 exports.Prisma.SourceScalarFieldEnum = {
   id: 'id',
+  source: 'source',
   recipeUrl: 'recipeUrl',
   recipeDate: 'recipeDate',
   htmlContent: 'htmlContent',
@@ -181,6 +182,13 @@ exports.Prisma.SourceImageScalarFieldEnum = {
   downloaded: 'downloaded',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PublicationQueueScalarFieldEnum = {
+  id: 'id',
+  sourceId: 'sourceId',
+  scheduledAt: 'scheduledAt',
+  status: 'status'
 };
 
 exports.Prisma.SortOrder = {
@@ -232,6 +240,7 @@ exports.Prisma.PhraseOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.SourceOrderByRelevanceFieldEnum = {
+  source: 'source',
   recipeUrl: 'recipeUrl',
   htmlContent: 'htmlContent',
   version: 'version',
@@ -243,7 +252,12 @@ exports.Prisma.SourceImageOrderByRelevanceFieldEnum = {
   url: 'url',
   alt: 'alt'
 };
-
+exports.PublicationStatus = exports.$Enums.PublicationStatus = {
+  pending: 'pending',
+  published: 'published',
+  failed: 'failed',
+  canceled: 'canceled'
+};
 
 exports.Prisma.ModelName = {
   Category: 'Category',
@@ -251,7 +265,8 @@ exports.Prisma.ModelName = {
   Ingredient: 'Ingredient',
   Phrase: 'Phrase',
   Source: 'Source',
-  SourceImage: 'SourceImage'
+  SourceImage: 'SourceImage',
+  PublicationQueue: 'PublicationQueue'
 };
 
 /**

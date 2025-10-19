@@ -11,6 +11,7 @@ async function publishRecipe(recipeId: number) {
         where: { id: recipeId },
         select: {
             id: true,
+            source: true,
             jsonAltered: true,
         },
     });
@@ -42,6 +43,7 @@ async function publishRecipe(recipeId: number) {
         data: {
             sourceId: src.id,
             title: json.title,
+            source: src.source,
             slug: slugify(json.title, { lower: true, strict: true }),
             json,
             categories: {
