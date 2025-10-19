@@ -188,7 +188,8 @@ exports.Prisma.PublicationQueueScalarFieldEnum = {
   id: 'id',
   sourceId: 'sourceId',
   scheduledAt: 'scheduledAt',
-  status: 'status'
+  status: 'status',
+  userId: 'userId'
 };
 
 exports.Prisma.SortOrder = {

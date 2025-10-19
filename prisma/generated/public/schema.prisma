@@ -79,6 +79,8 @@ model TokenValidity {
 enum Role {
   USER
   SUPERADMIN
+  CREATOR
+  PUBLISHER
 }
 
 enum Gender {

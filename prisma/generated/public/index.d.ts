@@ -50,7 +50,9 @@ export type TokenValidity = $Result.DefaultSelection<Prisma.$TokenValidityPayloa
 export namespace $Enums {
   export const Role: {
   USER: 'USER',
-  SUPERADMIN: 'SUPERADMIN'
+  SUPERADMIN: 'SUPERADMIN',
+  CREATOR: 'CREATOR',
+  PUBLISHER: 'PUBLISHER'
 };
 
 export type Role = (typeof Role)[keyof typeof Role]

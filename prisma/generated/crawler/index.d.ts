@@ -7405,11 +7405,13 @@ export namespace Prisma {
   export type PublicationQueueAvgAggregateOutputType = {
     id: number | null
     sourceId: number | null
+    userId: number | null
   }
 
   export type PublicationQueueSumAggregateOutputType = {
     id: number | null
     sourceId: number | null
+    userId: number | null
   }
 
   export type PublicationQueueMinAggregateOutputType = {
@@ -7417,6 +7419,7 @@ export namespace Prisma {
     sourceId: number | null
     scheduledAt: Date | null
     status: $Enums.PublicationStatus | null
+    userId: number | null
   }
 
   export type PublicationQueueMaxAggregateOutputType = {
@@ -7424,6 +7427,7 @@ export namespace Prisma {
     sourceId: number | null
     scheduledAt: Date | null
     status: $Enums.PublicationStatus | null
+    userId: number | null
   }
 
   export type PublicationQueueCountAggregateOutputType = {
@@ -7431,6 +7435,7 @@ export namespace Prisma {
     sourceId: number
     scheduledAt: number
     status: number
+    userId: number
     _all: number
   }
 
@@ -7438,11 +7443,13 @@ export namespace Prisma {
   export type PublicationQueueAvgAggregateInputType = {
     id?: true
     sourceId?: true
+    userId?: true
   }
 
   export type PublicationQueueSumAggregateInputType = {
     id?: true
     sourceId?: true
+    userId?: true
   }
 
   export type PublicationQueueMinAggregateInputType = {
@@ -7450,6 +7457,7 @@ export namespace Prisma {
     sourceId?: true
     scheduledAt?: true
     status?: true
+    userId?: true
   }
 
   export type PublicationQueueMaxAggregateInputType = {
@@ -7457,6 +7465,7 @@ export namespace Prisma {
     sourceId?: true
     scheduledAt?: true
     status?: true
+    userId?: true
   }
 
   export type PublicationQueueCountAggregateInputType = {
@@ -7464,6 +7473,7 @@ export namespace Prisma {
     sourceId?: true
     scheduledAt?: true
     status?: true
+    userId?: true
     _all?: true
   }
 
@@ -7558,6 +7568,7 @@ export namespace Prisma {
     sourceId: number
     scheduledAt: Date
     status: $Enums.PublicationStatus
+    userId: number | null
     _count: PublicationQueueCountAggregateOutputType | null
     _avg: PublicationQueueAvgAggregateOutputType | null
     _sum: PublicationQueueSumAggregateOutputType | null
@@ -7584,6 +7595,7 @@ export namespace Prisma {
     sourceId?: boolean
     scheduledAt?: boolean
     status?: boolean
+    userId?: boolean
     source?: boolean | SourceDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["publicationQueue"]>
 
@@ -7594,9 +7606,10 @@ export namespace Prisma {
     sourceId?: boolean
     scheduledAt?: boolean
     status?: boolean
+    userId?: boolean
   }
 
-  export type PublicationQueueOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sourceId" | "scheduledAt" | "status", ExtArgs["result"]["publicationQueue"]>
+  export type PublicationQueueOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sourceId" | "scheduledAt" | "status" | "userId", ExtArgs["result"]["publicationQueue"]>
   export type PublicationQueueInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     source?: boolean | SourceDefaultArgs<ExtArgs>
   }
@@ -7611,6 +7624,7 @@ export namespace Prisma {
       sourceId: number
       scheduledAt: Date
       status: $Enums.PublicationStatus
+      userId: number | null
     }, ExtArgs["result"]["publicationQueue"]>
     composites: {}
   }
@@ -7985,6 +7999,7 @@ export namespace Prisma {
     readonly sourceId: FieldRef<"PublicationQueue", 'Int'>
     readonly scheduledAt: FieldRef<"PublicationQueue", 'DateTime'>
     readonly status: FieldRef<"PublicationQueue", 'PublicationStatus'>
+    readonly userId: FieldRef<"PublicationQueue", 'Int'>
   }
     
 
@@ -8446,7 +8461,8 @@ export namespace Prisma {
     id: 'id',
     sourceId: 'sourceId',
     scheduledAt: 'scheduledAt',
-    status: 'status'
+    status: 'status',
+    userId: 'userId'
   };
 
   export type PublicationQueueScalarFieldEnum = (typeof PublicationQueueScalarFieldEnum)[keyof typeof PublicationQueueScalarFieldEnum]
@@ -9054,6 +9070,7 @@ export namespace Prisma {
     sourceId?: IntFilter<"PublicationQueue"> | number
     scheduledAt?: DateTimeFilter<"PublicationQueue"> | Date | string
     status?: EnumPublicationStatusFilter<"PublicationQueue"> | $Enums.PublicationStatus
+    userId?: IntNullableFilter<"PublicationQueue"> | number | null
     source?: XOR<SourceScalarRelationFilter, SourceWhereInput>
   }
 
@@ -9062,6 +9079,7 @@ export namespace Prisma {
     sourceId?: SortOrder
     scheduledAt?: SortOrder
     status?: SortOrder
+    userId?: SortOrderInput | SortOrder
     source?: SourceOrderByWithRelationInput
   }
 
@@ -9073,6 +9091,7 @@ export namespace Prisma {
     NOT?: PublicationQueueWhereInput | PublicationQueueWhereInput[]
     scheduledAt?: DateTimeFilter<"PublicationQueue"> | Date | string
     status?: EnumPublicationStatusFilter<"PublicationQueue"> | $Enums.PublicationStatus
+    userId?: IntNullableFilter<"PublicationQueue"> | number | null
     source?: XOR<SourceScalarRelationFilter, SourceWhereInput>
   }, "id" | "sourceId">
 
@@ -9081,6 +9100,7 @@ export namespace Prisma {
     sourceId?: SortOrder
     scheduledAt?: SortOrder
     status?: SortOrder
+    userId?: SortOrderInput | SortOrder
     _count?: PublicationQueueCountOrderByAggregateInput
     _avg?: PublicationQueueAvgOrderByAggregateInput
     _max?: PublicationQueueMaxOrderByAggregateInput
@@ -9096,6 +9116,7 @@ export namespace Prisma {
     sourceId?: IntWithAggregatesFilter<"PublicationQueue"> | number
     scheduledAt?: DateTimeWithAggregatesFilter<"PublicationQueue"> | Date | string
     status?: EnumPublicationStatusWithAggregatesFilter<"PublicationQueue"> | $Enums.PublicationStatus
+    userId?: IntNullableWithAggregatesFilter<"PublicationQueue"> | number | null
   }
 
   export type CategoryCreateInput = {
@@ -9547,6 +9568,7 @@ export namespace Prisma {
   export type PublicationQueueCreateInput = {
     scheduledAt: Date | string
     status?: $Enums.PublicationStatus
+    userId?: number | null
     source: SourceCreateNestedOneWithoutPublicationQueueInput
   }
 
@@ -9555,11 +9577,13 @@ export namespace Prisma {
     sourceId: number
     scheduledAt: Date | string
     status?: $Enums.PublicationStatus
+    userId?: number | null
   }
 
   export type PublicationQueueUpdateInput = {
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
     source?: SourceUpdateOneRequiredWithoutPublicationQueueNestedInput
   }
 
@@ -9568,6 +9592,7 @@ export namespace Prisma {
     sourceId?: IntFieldUpdateOperationsInput | number
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type PublicationQueueCreateManyInput = {
@@ -9575,11 +9600,13 @@ export namespace Prisma {
     sourceId: number
     scheduledAt: Date | string
     status?: $Enums.PublicationStatus
+    userId?: number | null
   }
 
   export type PublicationQueueUpdateManyMutationInput = {
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type PublicationQueueUncheckedUpdateManyInput = {
@@ -9587,6 +9614,7 @@ export namespace Prisma {
     sourceId?: IntFieldUpdateOperationsInput | number
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -10202,11 +10230,13 @@ export namespace Prisma {
     sourceId?: SortOrder
     scheduledAt?: SortOrder
     status?: SortOrder
+    userId?: SortOrder
   }
 
   export type PublicationQueueAvgOrderByAggregateInput = {
     id?: SortOrder
     sourceId?: SortOrder
+    userId?: SortOrder
   }
 
   export type PublicationQueueMaxOrderByAggregateInput = {
@@ -10214,6 +10244,7 @@ export namespace Prisma {
     sourceId?: SortOrder
     scheduledAt?: SortOrder
     status?: SortOrder
+    userId?: SortOrder
   }
 
   export type PublicationQueueMinOrderByAggregateInput = {
@@ -10221,11 +10252,13 @@ export namespace Prisma {
     sourceId?: SortOrder
     scheduledAt?: SortOrder
     status?: SortOrder
+    userId?: SortOrder
   }
 
   export type PublicationQueueSumOrderByAggregateInput = {
     id?: SortOrder
     sourceId?: SortOrder
+    userId?: SortOrder
   }
 
   export type EnumPublicationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -10861,12 +10894,14 @@ export namespace Prisma {
   export type PublicationQueueCreateWithoutSourceInput = {
     scheduledAt: Date | string
     status?: $Enums.PublicationStatus
+    userId?: number | null
   }
 
   export type PublicationQueueUncheckedCreateWithoutSourceInput = {
     id?: number
     scheduledAt: Date | string
     status?: $Enums.PublicationStatus
+    userId?: number | null
   }
 
   export type PublicationQueueCreateOrConnectWithoutSourceInput = {
@@ -10920,12 +10955,14 @@ export namespace Prisma {
   export type PublicationQueueUpdateWithoutSourceInput = {
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type PublicationQueueUncheckedUpdateWithoutSourceInput = {
     id?: IntFieldUpdateOperationsInput | number
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumPublicationStatusFieldUpdateOperationsInput | $Enums.PublicationStatus
+    userId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type SourceCreateWithoutSourceImagesInput = {

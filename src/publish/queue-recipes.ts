@@ -1,7 +1,9 @@
 import "dotenv/config";
-import {Prisma, PrismaClient as PrismaCrawler } from "@prisma/crawler";
+import { Prisma, PrismaClient as PrismaCrawler } from "@prisma/crawler";
+import { PrismaClient, Role } from "@prisma/public";
 
 const crawler = new PrismaCrawler();
+const prisma = new PrismaClient();
 
 // Configuration
 const RECIPES_PER_DAY = 5;
@@ -34,6 +36,19 @@ function generateDaySchedule(date: Date, recipeCount: number): Date[] {
 
 async function main() {
     console.log("📋 Queueing recipes for publication\n");
+
+    // Get all publishers
+    const publishers = await prisma.user.findMany({
+        where: { role: Role.PUBLISHER },
+        select: { id: true, username: true },
+    });
+
+    if (publishers.length === 0) {
+        console.log("⚠️  No publishers found. Please create users with PUBLISHER role first.");
+        return;
+    }
+
+    console.log(`👥 Found ${publishers.length} publishers: ${publishers.map(p => p.username).join(', ')}\n`);
 
     // Find last scheduled date
     const lastScheduled = await crawler.publicationQueue.findFirst({
@@ -94,16 +109,20 @@ async function main() {
         day++;
     }
 
-    // Save to database
+    // Save to database with random publisher assignment
     for (let i = 0; i < selected.length; i++) {
+        const publisher = publishers[Math.floor(Math.random() * publishers.length)];
+
         await crawler.publicationQueue.create({
             data: {
                 sourceId: selected[i].id,
                 scheduledAt: schedule[i],
                 status: "pending",
+                userId: publisher.id,
             },
         });
-        console.log(`📅 Recipe ${selected[i].id} → ${schedule[i].toLocaleString()}`);
+
+        console.log(`📅 Recipe ${selected[i].id} → ${schedule[i].toLocaleString()} (${publisher.username})`);
     }
 
     console.log(`\n🎉 Queued ${selected.length} recipes`);
@@ -114,4 +133,5 @@ main()
     .catch((err) => console.error(err))
     .finally(async () => {
         await crawler.$disconnect();
+        await prisma.$disconnect();
     });

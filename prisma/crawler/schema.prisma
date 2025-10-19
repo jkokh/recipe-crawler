@@ -102,10 +102,12 @@ model PublicationQueue {
   sourceId    Int               @unique @map("source_id")
   scheduledAt DateTime          @map("scheduled_at")
   status      PublicationStatus @default(pending) @map("status")
+  userId      Int?              @map("user_id") // Add this line
   source      Source            @relation(fields: [sourceId], references: [id])
 
   @@index([scheduledAt], map: "idx_pubq_scheduled_at")
   @@index([status, scheduledAt], map: "idx_pubq_status_scheduled_at")
+  @@index([userId], map: "idx_pubq_user_id") // Add this line for better query performance
   @@map("publication_queue")
 }
 
