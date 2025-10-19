@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import { RecipeJson } from "../types";
-import { cryptoHash } from "../lib/utils";
+import { PrismaClient } from "@prisma/crawler";
+import { RecipeJson } from "@/types";
+import { cryptoHash } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 

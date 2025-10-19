@@ -1,6 +1,6 @@
 import {CategoryDTO, CategoryManager} from "./CategoryManager";
 import {scoreRecipeCategories} from "src/lib/categoryScorer";
-import {Source} from "@prisma/client";
+import {Source} from "@prisma/crawler";
 
 interface CategoryScore {
     categoryId: number;

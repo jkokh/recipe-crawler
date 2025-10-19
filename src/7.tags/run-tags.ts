@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/crawler';
 import { querier } from './querier';
 import {loadTagsCache, resolveTagsToIds, mergeTagIds, validateExistingTags} from './utils';
-import type { RecipeJson } from '../types';
-import {VERSION} from "../constants";
+import type { RecipeJson } from '@/types';
+import {VERSION} from "@/constants";
 
 const prisma = new PrismaClient();
 

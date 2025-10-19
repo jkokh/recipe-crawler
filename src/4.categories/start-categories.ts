@@ -1,11 +1,11 @@
-import { CategoryManager } from "../lib/CategoryManager";
+import { CategoryManager } from "@/lib/CategoryManager";
 import { iterate, prisma } from "src/lib/iterator";
-import { RecipeJson } from "../types";
-import {CategoryProcessor} from "../lib/CategoryProcessor";
+import { RecipeJson } from "@/types";
+import {CategoryProcessor} from "@/lib/CategoryProcessor";
 import {querier} from "./querier";
-import {Source} from "@prisma/client";
-import {VERSION} from "../constants";
 
+import {VERSION} from "@/constants";
+import { Source } from "@prisma/crawler"
 
 export async function process(): Promise<void> {
     const categoryManager = new CategoryManager(prisma);

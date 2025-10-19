@@ -1,7 +1,7 @@
 // process.ts
-import { iterate, prisma } from "../../lib/iterator";
-import { RecipeJson } from "../../types";
-import {Source} from "@prisma/client";
+import { iterate, prisma } from "@/lib/iterator";
+import { RecipeJson } from "@/types";
+import {Source} from "@prisma/crawler";
 
 
 export async function processRecipes() {

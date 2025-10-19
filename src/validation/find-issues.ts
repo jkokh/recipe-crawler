@@ -1,6 +1,6 @@
-import { prisma } from "../lib/iterator";
-import { Prisma } from "@prisma/client";
-import { RecipeJson } from "../types";
+import { prisma } from "@/lib/iterator";
+import { Prisma } from "@prisma/crawler";
+import { RecipeJson } from "@/types";
 import nlp from "compromise";
 import { suspiciousPatterns } from "./patterns";
 

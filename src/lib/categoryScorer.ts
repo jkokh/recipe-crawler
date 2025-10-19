@@ -1,8 +1,8 @@
 // src/lib/categoryScorer.ts
 // Calculate category scores for a recipe using JSON keywords on each category.
 
-import {Source} from "@prisma/client";
-import {RecipeJson} from "../types";
+import {Source} from "@prisma/crawler";
+import {RecipeJson} from "@/types";
 
 export type CategoryKeywords = { positives?: string[]; negatives?: string[] };
 

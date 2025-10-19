@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/public"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_POSTGRES")
+}
+
+model Recipe {
+  id          Int      @id @default(autoincrement())
+  sourceId    Int      @unique
+  title       String
+  slug        String?  @unique
+  json        Json
+  publishedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categories  Category[]   @relation("RecipeCategories")
+  tags        Tag[]        @relation("RecipeTags")
+  ingredients Ingredient[] @relation("RecipeIngredients")
+}
+
+model Category {
+  id       Int      @id
+  parentId Int?
+  title    String
+  slug     String   @unique
+  recipes  Recipe[] @relation("RecipeCategories")
+}
+
+model Tag {
+  id      Int      @id
+  name    String
+  slug    String   @unique
+  recipes Recipe[] @relation("RecipeTags")
+}
+
+model Ingredient {
+  id      BigInt   @id
+  name    String
+  slug    String   @unique
+  recipes Recipe[] @relation("RecipeIngredients")
+}

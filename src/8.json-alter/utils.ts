@@ -1,6 +1,6 @@
-import { Paragraph, Step } from "../types";
-import {PrismaClient, SourceImage} from "@prisma/client";
-import {cryptoHash} from "../lib/utils";
+import { Paragraph, Step } from "@/types";
+import {PrismaClient, SourceImage} from "@prisma/crawler";
+import {cryptoHash} from "@/lib/utils";
 
 
 export async function getPhrasedText(

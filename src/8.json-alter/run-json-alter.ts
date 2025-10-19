@@ -1,6 +1,6 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import { RecipeJson } from "../types";
-import { VERSION } from "../constants";
+import { Prisma, PrismaClient } from "@prisma/crawler";
+import { RecipeJson } from "@/types";
+import { VERSION } from "@/constants";
 import {alterImages, alterParagraphs, alterSteps, getPhrasedText} from "./utils";
 
 const prisma = new PrismaClient();

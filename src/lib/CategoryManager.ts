@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/crawler";
 
 export interface CategoryKeywords {
     positives?: string[];

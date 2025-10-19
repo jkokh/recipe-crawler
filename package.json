@@ -4,11 +4,12 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "linkCrawler": "node --import ./register-loader.js src/crawler/crawler.ts",
-    "sitemapLinks": "node --import ./register-loader.js src/0.sitemap-parser/run-sitemap-parser.ts",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:deploy": "prisma migrate deploy"
+    "crawler:generate": "prisma generate --schema=prisma/crawler/schema.prisma",
+    "crawler:migrate": "prisma migrate dev --schema=prisma/crawler/schema.prisma",
+    "crawler:deploy": "prisma migrate deploy --schema=prisma/crawler/schema.prisma",
+    "public:generate": "prisma generate --schema=prisma/public/public-schema.prisma",
+    "public:migrate": "prisma migrate dev --schema=prisma/public/public-schema.prisma",
+    "public:deploy": "prisma migrate deploy --schema=prisma/public/public-schema.prisma"
   },
   "keywords": [],
   "author": "",
@@ -41,6 +42,7 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "sanitize-html": "^2.17.0",
     "sharp": "^0.34.3",
+    "slugify": "^1.6.6",
     "turndown": "^7.2.0",
     "xml2js": "^0.6.2"
   },

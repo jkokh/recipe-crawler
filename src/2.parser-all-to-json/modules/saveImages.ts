@@ -1,5 +1,5 @@
-import { ImagesParsed } from "../../types";
-import {PrismaClient, SourceImage} from "@prisma/client";
+import { ImagesParsed } from "@/types";
+import {PrismaClient, SourceImage} from "@prisma/crawler";
 
 
 export async function saveImages(

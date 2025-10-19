@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/crawler";
 import { getTitle } from "./modules/getTitle";
 import { getIngredients } from "./modules/getIngredients";
 import { getNutrition } from "./modules/getNutrition";
@@ -8,8 +8,8 @@ import { getParagraphs } from "./modules/getParagraphs";
 import { getRecipeMeta } from "./modules/getMeta";
 import { parseImages } from "./modules/getImages";
 import { saveImages } from "./modules/saveImages";
-import { RecipeJson } from "../types";
-import {VERSION} from "../constants";
+import { RecipeJson } from "@/types";
+import {VERSION} from "@/constants";
 import {cleanup} from "./modules/cleanup";
 
 const prisma = new PrismaClient();

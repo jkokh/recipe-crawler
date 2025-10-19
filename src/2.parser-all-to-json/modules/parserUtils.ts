@@ -1,4 +1,4 @@
-import {SourceImage} from "@prisma/client";
+import {SourceImage} from "@prisma/crawler";
 import {stableIdFromUrl} from "./getImages";
 
 export function getSimplyDataSrc(el: cheerio.Cheerio): string[] {

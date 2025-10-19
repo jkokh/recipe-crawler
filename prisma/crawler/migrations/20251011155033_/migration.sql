@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `phrases` ADD COLUMN `index` INTEGER NOT NULL DEFAULT 0;

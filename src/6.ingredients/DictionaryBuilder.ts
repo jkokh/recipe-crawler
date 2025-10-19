@@ -6,9 +6,9 @@ Purpose: Builds an ingredient dictionary by scanning all source.recipe JSONs for
 - Synchronizes the set with the `ingredient` table (inserts new ones)
 - Returns a Map of slug → ingredient id (bigint)
 */
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/crawler";
 import { IngredientNormalizer } from './IngredientNormalizer';
-import {RecipeJson} from "../types";
+import {RecipeJson} from "@/types";
 
 
 export class DictionaryBuilder {

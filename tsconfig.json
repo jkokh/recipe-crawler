@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@prisma/*": ["prisma/generated/*"]
+    },
     "sourceRoot": "src",
     "module": "esnext",
     "target": "esnext",
@@ -29,8 +33,9 @@
     ],
     "typeRoots": [
       "./node_modules/@types",
-      "./src/types",
+      "./src/types"
     ],
     "skipLibCheck": true
-  }
+  },
+  "include": ["src"]
 }

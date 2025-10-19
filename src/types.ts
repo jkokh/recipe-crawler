@@ -1,4 +1,4 @@
-import {SourceImage} from "@prisma/client";
+import {SourceImage} from "@prisma/crawler";
 
 
 export type RecipeJson = {

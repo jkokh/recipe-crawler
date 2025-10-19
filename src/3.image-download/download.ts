@@ -28,11 +28,11 @@
  * - Progress logging every 10 downloads
  */
 
-import {PrismaClient, SourceImage} from '@prisma/client';
+import {PrismaClient, SourceImage} from '@prisma/crawler';
 import fs from 'fs/promises';
 import path from 'path';
 import pLimit from 'p-limit';
-import {downloadImageWithPuppeteer} from "../lib/fetchHtmlPuppeteer";
+import {downloadImageWithPuppeteer} from "@/lib/fetchHtmlPuppeteer";
 
 const prisma = new PrismaClient();
 

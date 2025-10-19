@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { buildSlug, toDisplayName } from '../lib/utils';
+import { PrismaClient } from '@prisma/crawler';
+import { buildSlug, toDisplayName } from '@/lib/utils';
 
 /**
  * Load all tags from DB into a Map for the fast lookup
