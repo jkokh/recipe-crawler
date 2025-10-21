@@ -1,6 +1,7 @@
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import * as os from "os";
 
 const INPUT_DIR = "../3.image-download/images";
 const OUTPUT_DIR = "./image-out";
@@ -26,6 +27,7 @@ interface ProcessingConfig {
         value: number;
     };
     skipExisting: boolean;
+    parallelWorkers: number; // Number of parallel workers (0 = auto-detect)
 }
 
 const CONFIG: ProcessingConfig = {
@@ -47,6 +49,7 @@ const CONFIG: ProcessingConfig = {
         value: 6, // try 60 to see a clear effect; then tune (15–35)
     },
     skipExisting: true,
+    parallelWorkers: 0, // 0 = auto (uses CPU count - 1), or set specific number
 };
 
 // ============================================================================
@@ -70,7 +73,9 @@ const ensureDir = (dir: string) => {
 const getTempPath = (outPath: string): string => {
     const dir = path.dirname(outPath);
     const base = path.basename(outPath, path.extname(outPath));
-    return path.join(dir, `${base}.tmp.png`);
+    // Add timestamp and random string to make it unique across parallel workers
+    const unique = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    return path.join(dir, `${base}.${unique}.tmp.png`);
 };
 
 // ============================================================================
@@ -89,6 +94,32 @@ const getImageDimensions = (file: string): { w: number; h: number } => {
     } catch {
         return { w: 1, h: 1 };
     }
+};
+
+// Execute ImageMagick command asynchronously (non-blocking for parallel processing)
+const execMagickAsync = (cmd: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const child = spawn("sh", ["-c", cmd], {
+            stdio: ["ignore", "pipe", "pipe"],
+        });
+
+        let stderr = "";
+        if (child.stderr) {
+            child.stderr.on("data", (data) => {
+                stderr += data.toString();
+            });
+        }
+
+        child.on("close", (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(new Error(stderr || `Command failed with code ${code}`));
+            }
+        });
+
+        child.on("error", reject);
+    });
 };
 
 // ============================================================================
@@ -209,11 +240,11 @@ const buildVignetteCommand = (
 // Image Processing Pipeline
 // ============================================================================
 
-const applyRotation = (
+const applyRotation = async (
     inputPath: string,
     tempPath: string,
     angle: number
-): { success: boolean; dimensions?: { w: number; h: number } } => {
+): Promise<{ success: boolean; dimensions?: { w: number; h: number } }> => {
     try {
         const { w, h } = getImageDimensions(inputPath);
         const crop = calculateCropPercentages(angle, w / h);
@@ -226,7 +257,7 @@ const applyRotation = (
             `-background white -alpha remove -alpha off ` +
             `"${tempPath}"`;
 
-        execSync(cmd, { stdio: "pipe" });
+        await execMagickAsync(cmd);
 
         const rotatedDims = getImageDimensions(tempPath);
 
@@ -236,16 +267,17 @@ const applyRotation = (
     }
 };
 
-const applyEffects = (
+const applyEffects = async (
     tempPath: string,
     outputPath: string,
     config: ProcessingConfig,
     dimensions: { w: number; h: number }
-): boolean => {
-    try {
-        // Write to a temporary output file first
-        const tempOutputPath = outputPath + ".tmp";
+): Promise<boolean> => {
+    // Create unique temp output to avoid collisions
+    const unique = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const tempOutputPath = `${outputPath}.${unique}.tmp`;
 
+    try {
         const tempCmd = buildTemperatureCommand(config.temperature);
         const vignetteCmd = buildVignetteCommand(
             config.vignette,
@@ -259,7 +291,7 @@ const applyEffects = (
             `${vignetteCmd} ` +
             `"${tempOutputPath}"`;
 
-        execSync(cmd, { stdio: "pipe", maxBuffer: 10 * 1024 * 1024 });
+        await execMagickAsync(cmd);
 
         // Atomic rename - only replace the final file if processing succeeded
         fs.renameSync(tempOutputPath, outputPath);
@@ -268,7 +300,6 @@ const applyEffects = (
     } catch (e: any) {
         // Clean up temporary output file if it exists
         try {
-            const tempOutputPath = outputPath + ".tmp";
             if (fs.existsSync(tempOutputPath)) {
                 fs.unlinkSync(tempOutputPath);
             }
@@ -277,11 +308,11 @@ const applyEffects = (
     }
 };
 
-const processImage = (
+const processImage = async (
     inputPath: string,
     outputPath: string,
     config: ProcessingConfig
-): boolean => {
+): Promise<boolean> => {
     const tempPath = getTempPath(outputPath);
 
     try {
@@ -291,7 +322,7 @@ const processImage = (
         let dimensions: { w: number; h: number };
         if (config.rotation.enabled) {
             const angle = generateRotationAngle(config.rotation);
-            const result = applyRotation(inputPath, tempPath, angle);
+            const result = await applyRotation(inputPath, tempPath, angle);
             if (!result.success || !result.dimensions) {
                 throw new Error("Rotation failed");
             }
@@ -303,7 +334,7 @@ const processImage = (
         }
 
         // Apply temperature and vignette effects
-        const success = applyEffects(tempPath, outputPath, config, dimensions);
+        const success = await applyEffects(tempPath, outputPath, config, dimensions);
 
         // Cleanup temp file
         try {
@@ -312,9 +343,62 @@ const processImage = (
 
         return success;
     } catch (e: any) {
+        try {
+            if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+        } catch {}
         return false;
     }
 };
+
+// ============================================================================
+// Parallel Processing Utilities
+// ============================================================================
+
+interface ProcessingResult {
+    success: boolean;
+    skipped: boolean;
+}
+
+async function processImageAsync(
+    inputPath: string,
+    outputPath: string,
+    config: ProcessingConfig
+): Promise<ProcessingResult> {
+    // Check and skip before processing
+    if (config.skipExisting && fs.existsSync(outputPath)) {
+        return { success: true, skipped: true };
+    }
+
+    const success = await processImage(inputPath, outputPath, config);
+    return { success, skipped: false };
+}
+
+async function processBatch(
+    files: Array<{ inPath: string; outPath: string }>,
+    config: ProcessingConfig,
+    onProgress: (result: ProcessingResult) => void
+): Promise<void> {
+    const limit = config.parallelWorkers || Math.max(1, os.cpus().length - 1);
+
+    let index = 0;
+
+    const processNext = async (): Promise<void> => {
+        while (index < files.length) {
+            const currentIndex = index++;
+            const { inPath, outPath } = files[currentIndex];
+
+            const result = await processImageAsync(inPath, outPath, config);
+            onProgress(result);
+        }
+    };
+
+    // Start worker pool
+    const workers = Array(Math.min(limit, files.length))
+        .fill(null)
+        .map(() => processNext());
+
+    await Promise.all(workers);
+}
 
 // ============================================================================
 // Progress Reporting
@@ -413,17 +497,24 @@ function main() {
         return;
     }
 
+    const workers = CONFIG.parallelWorkers || Math.max(1, os.cpus().length - 1);
+
     console.log(`Processing ${files.length} image${files.length === 1 ? "" : "s"}…\n`);
     console.log("Configuration:");
+    console.log(`  Parallel workers: ${workers}`);
     console.log(`  Skip existing: ${CONFIG.skipExisting ? "enabled" : "disabled"}`);
     console.log(`  Rotation: ${CONFIG.rotation.enabled ? "enabled" : "disabled"}`);
     if (CONFIG.rotation.enabled) {
-        console.log(`    Angle range: ${CONFIG.rotation.minAngle}° to ${CONFIG.rotation.maxAngle}°`);
+        console.log(
+            `    Angle range: ${CONFIG.rotation.minAngle}° to ${CONFIG.rotation.maxAngle}°`
+        );
     }
     console.log(`  Vignette: ${CONFIG.vignette.enabled ? "enabled" : "disabled"}`);
     if (CONFIG.vignette.enabled) {
         console.log(`    Inner: ${CONFIG.vignette.inner}%, Outer: ${CONFIG.vignette.outer}%`);
-        console.log(`    Feather: ${CONFIG.vignette.feather}%, Amount: ${CONFIG.vignette.amount}%`);
+        console.log(
+            `    Feather: ${CONFIG.vignette.feather}%, Amount: ${CONFIG.vignette.amount}%`
+        );
         console.log(`    Color: ${CONFIG.vignette.color}`);
     }
     console.log(`  Temperature: ${CONFIG.temperature.enabled ? "enabled" : "disabled"}`);
@@ -433,47 +524,46 @@ function main() {
 
     let succeeded = 0;
     let skipped = 0;
+    let processed = 0;
     const startTime = Date.now();
 
-    for (let i = 0; i < files.length; i++) {
-        const inPath = files[i];
-        const rel = path.relative(INPUT_DIR, inPath);
-        const outPath = path.join(OUTPUT_DIR, rel);
+    const filePairs = files.map((inPath) => ({
+        inPath,
+        outPath: path.join(OUTPUT_DIR, path.relative(INPUT_DIR, inPath)),
+    }));
 
-        // Check and skip before processing
-        if (CONFIG.skipExisting && fs.existsSync(outPath)) {
+    processBatch(filePairs, CONFIG, (result) => {
+        processed++;
+        if (result.success) {
             succeeded++;
-            skipped++;
-        } else {
-            if (processImage(inPath, outPath, CONFIG)) {
-                succeeded++;
+            if (result.skipped) {
+                skipped++;
             }
         }
 
-        const current = i + 1;
-        printProgress(current, files.length, succeeded, skipped, startTime);
+        printProgress(processed, files.length, succeeded, skipped, startTime);
 
-        if (current % REPORT_INTERVAL === 0 && current < files.length) {
-            printIntermediateReport(current, files.length, succeeded, skipped, startTime);
+        if (processed % REPORT_INTERVAL === 0 && processed < files.length) {
+            printIntermediateReport(processed, files.length, succeeded, skipped, startTime);
         }
-    }
+    }).then(() => {
+        const failed = files.length - succeeded;
+        const totalTime = (Date.now() - startTime) / 1000;
 
-    const failed = files.length - succeeded;
-    const totalTime = (Date.now() - startTime) / 1000;
+        const skipInfo = skipped > 0 ? `\n  ⊘ Skipped: ${skipped}` : "";
 
-    const skipInfo = skipped > 0 ? `\n  ⊘ Skipped: ${skipped}` : "";
-
-    console.log(
-        `\n\n${"=".repeat(50)}` +
-        `\nFinal Summary:` +
-        `\n  Total: ${files.length} images` +
-        `\n  ✓ Succeeded: ${succeeded}` +
-        `\n  ✗ Failed: ${failed}${skipInfo}` +
-        `\n  Success rate: ${((succeeded / files.length) * 100).toFixed(1)}%` +
-        `\n  Total time: ${formatTime(totalTime)}` +
-        `\n  Avg time/image: ${(totalTime / files.length).toFixed(2)}s` +
-        `\n${"=".repeat(50)}`
-    );
+        console.log(
+            `\n\n${"=".repeat(50)}` +
+            `\nFinal Summary:` +
+            `\n  Total: ${files.length} images` +
+            `\n  ✓ Succeeded: ${succeeded}` +
+            `\n  ✗ Failed: ${failed}${skipInfo}` +
+            `\n  Success rate: ${((succeeded / files.length) * 100).toFixed(1)}%` +
+            `\n  Total time: ${formatTime(totalTime)}` +
+            `\n  Avg time/image: ${(totalTime / files.length).toFixed(2)}s` +
+            `\n${"=".repeat(50)}`
+        );
+    });
 }
 
-main();
+main()

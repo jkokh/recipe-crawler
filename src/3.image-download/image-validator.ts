@@ -29,7 +29,7 @@ async function isReallyValidImage(filePath: string): Promise<boolean> {
 }
 
 async function main() {
-    const baseDir = 'images/simplerecipes';
+    const baseDir = '../image-alter/image-out/simplerecipes';
     const concurrency = 8; // Number of images to validate in parallel
 
     // Get all RecipeImages with their parent RecipeUrl in one query
@@ -50,6 +50,7 @@ async function main() {
 
     await Promise.all(
         images.map(img => limit(async () => {
+            // if img.sourceId === null then the image was orphaned and should be deleted
             const folder = path.join(baseDir, img.sourceId!.toString());
             const base = img.stableId!.toString() + '.jpg';
             const filePath = path.join(folder, base);
